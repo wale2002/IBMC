@@ -9,10 +9,15 @@ const copyStatus = document.querySelector("[data-copy-status]");
 const cashFields = document.querySelector("[data-cash-fields]");
 const formStepLabel = document.querySelector(".form-step");
 const formError = document.querySelector("[data-form-error]");
+const stepProgress = document.querySelector("[data-step-progress]");
+const stepTitle = document.querySelector("[data-step-title]");
+const floatingCta = document.querySelector("[data-floating-cta]");
 let lastSummaryText = "";
 
 const updateHeader = () => {
-  header?.classList.toggle("scrolled", window.scrollY > 24);
+  const requiresSolidHeader = document.body.classList.contains("pledge-page-body");
+  header?.classList.toggle("scrolled", requiresSolidHeader || window.scrollY > 24);
+  floatingCta?.classList.toggle("visible", window.scrollY > 520);
 };
 
 const closeMenu = () => {
@@ -32,7 +37,8 @@ navigation?.querySelectorAll("a").forEach((link) => link.addEventListener("click
 window.addEventListener("scroll", updateHeader, { passive: true });
 updateHeader();
 
-document.querySelector("[data-year]").textContent = new Date().getFullYear();
+const yearTarget = document.querySelector("[data-year]");
+if (yearTarget) yearTarget.textContent = new Date().getFullYear();
 
 const setStep = (step) => {
   document.querySelectorAll("[data-step-panel]").forEach((panel) => {
@@ -41,6 +47,10 @@ const setStep = (step) => {
     panel.classList.toggle("active", active);
   });
   formStepLabel.textContent = `0${step} / 02`;
+  stepProgress?.classList.toggle("complete", step === 2);
+  if (stepTitle) {
+    stepTitle.textContent = step === 1 ? "Define your contribution" : "Confirm donor details";
+  }
   formError.textContent = "";
 
   if (step === 2) {
@@ -65,6 +75,52 @@ form.querySelectorAll('input[name="contributionType"]').forEach((input) => {
   input.addEventListener("change", updateContributionFields);
 });
 updateContributionFields();
+
+const amountInput = form.querySelector('[name="amount"]');
+const currencyInput = form.querySelector('[name="currency"]');
+const amountPresets = [...form.querySelectorAll("[data-amount]")];
+const presetValues = {
+  NGN: [
+    ["100000", "₦100k"],
+    ["500000", "₦500k"],
+    ["1000000", "₦1m"],
+    ["5000000", "₦5m"],
+  ],
+  USD: [
+    ["100", "$100"],
+    ["500", "$500"],
+    ["1000", "$1k"],
+    ["5000", "$5k"],
+  ],
+};
+
+const syncPresetState = () => {
+  amountPresets.forEach((button) => {
+    button.classList.toggle("selected", button.dataset.amount === amountInput?.value);
+  });
+};
+
+const updatePresetCurrency = () => {
+  const values = presetValues[currencyInput?.value] || presetValues.NGN;
+  amountPresets.forEach((button, index) => {
+    const [amount, label] = values[index];
+    button.dataset.amount = amount;
+    button.textContent = label;
+  });
+  syncPresetState();
+};
+
+amountPresets.forEach((button) => {
+  button.addEventListener("click", () => {
+    amountInput.value = button.dataset.amount;
+    syncPresetState();
+    amountInput.focus();
+  });
+});
+
+currencyInput?.addEventListener("change", updatePresetCurrency);
+amountInput?.addEventListener("input", syncPresetState);
+updatePresetCurrency();
 
 form.querySelector("[data-next-step]")?.addEventListener("click", () => {
   const type = selectedValue("contributionType");

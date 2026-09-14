@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Prepare a contribution brief for the Igbajo Baptist Medical Centre Endowment Fund."
+    />
+    <meta name="theme-color" content="#071b2d" />
+    <title>Prepare a Pledge — IBMC Endowment Fund</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23071b2d'/%3E%3Cpath d='M27 13h10v14h14v10H37v14H27V37H13V27h14z' fill='%23c78b52'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="../site.css" />
+    <script src="../site.js" defer></script>
+  </head>
+  <body class="pledge-page-body">
+    <a class="skip-link" href="#pledge-form">Skip to pledge form</a>
+
+    <header class="site-header pledge-page-header scrolled" data-header>
+      <div class="header-inner">
+        <a class="brand" href="../" aria-label="IBMC Endowment Fund home">
+          <span class="brand-mark" aria-hidden="true"><span>+</span></span>
+          <span class="brand-copy">
+            <strong>Igbajo Baptist Medical Centre</strong>
+            <span>Endowment Fund</span>
+          </span>
+        </a>
+        <a class="return-link" href="../"><span aria-hidden="true">←</span> Fund overview</a>
+      </div>
+    </header>
+
+    <main class="pledge-page-main">
+      <div class="pledge-page-shell">
+        <section class="pledge-page-context" aria-labelledby="pledge-page-title">
+          <p class="eyebrow">Private pledge preview</p>
+          <h1 id="pledge-page-title">Prepare your pledge.</h1>
+          <p class="pledge-page-intro">
+            Define the contribution, confirm how the Endowment Secretariat may contact you, then review the complete
+            brief before proceeding.
+          </p>
+
+          <div class="pledge-status-note">
+            <strong>No payment is collected here.</strong>
+            <p>
+              Approved banking and payment channels will be connected after IBMC completes its pre-launch review.
+            </p>
+          </div>
+
+          <div class="pledge-next">
+            <p class="micro-label">What follows at launch</p>
+            <ol>
+              <li><span>01</span><p>The Secretariat reviews the pledge and any restrictions.</p></li>
+              <li><span>02</span><p>Approved contribution instructions are confirmed securely.</p></li>
+              <li><span>03</span><p>The gift is recorded, reconciled and acknowledged.</p></li>
+            </ol>
+          </div>
+        </section>
+
+        <section class="pledge-page-workspace" aria-label="Pledge form">
+          <div class="workspace-heading">
+            <div>
+              <p>Contribution brief</p>
+              <span>Review before proceeding</span>
+            </div>
+            <span class="workspace-secure">Pre-launch</span>
+          </div>
+
+          <div class="step-progress" aria-hidden="true"><span data-step-progress></span></div>
+
+          <form class="pledge-form pledge-page-form" id="pledge-form" novalidate>
+            <div class="form-kicker">
+              <span data-step-title>Define your contribution</span>
+              <span class="form-step">01 / 02</span>
+            </div>
+
+            <div class="form-step-panel active" data-step-panel="1">
+              <fieldset>
+                <legend>What would you like to contribute?</legend>
+                <div class="option-grid contribution-options">
+                  <label><input type="radio" name="contributionType" value="Cash gift" checked /><span>Cash gift</span></label>
+                  <label><input type="radio" name="contributionType" value="Equipment" /><span>Equipment</span></label>
+                  <label><input type="radio" name="contributionType" value="Property" /><span>Property</span></label>
+                  <label><input type="radio" name="contributionType" value="Shares or securities" /><span>Shares / securities</span></label>
+                  <label><input type="radio" name="contributionType" value="Professional service" /><span>Professional service</span></label>
+                  <label><input type="radio" name="contributionType" value="Volunteer time" /><span>Volunteer time</span></label>
+                </div>
+              </fieldset>
+
+              <div class="cash-fields" data-cash-fields>
+                <div class="field-row">
+                  <label class="field currency-field">
+                    <span>Currency</span>
+                    <select name="currency">
+                      <option value="NGN">NGN — Nigerian naira</option>
+                      <option value="USD">USD — US dollar</option>
+                    </select>
+                  </label>
+                  <label class="field amount-field">
+                    <span>Indicative amount</span>
+                    <input name="amount" type="number" min="1" step="1" inputmode="decimal" placeholder="500,000" />
+                  </label>
+                </div>
+                <div class="amount-presets" aria-label="Suggested pledge amounts">
+                  <button type="button" data-amount="100000">₦100k</button>
+                  <button type="button" data-amount="500000">₦500k</button>
+                  <button type="button" data-amount="1000000">₦1m</button>
+                  <button type="button" data-amount="5000000">₦5m</button>
+                </div>
+                <fieldset class="frequency-fieldset">
+                  <legend>Frequency</legend>
+                  <div class="segmented-control">
+                    <label><input type="radio" name="frequency" value="One-time" checked /><span>One-time</span></label>
+                    <label><input type="radio" name="frequency" value="Monthly" /><span>Monthly</span></label>
+                    <label><input type="radio" name="frequency" value="Quarterly" /><span>Quarterly</span></label>
+                    <label><input type="radio" name="frequency" value="Annual" /><span>Annual</span></label>
+                  </div>
+                </fieldset>
+              </div>
+
+              <label class="field">
+                <span>Contribution note <small>Optional</small></span>
+                <textarea
+                  name="note"
+                  rows="3"
+                  placeholder="Share any timing, restriction, asset or service details."
+                ></textarea>
+              </label>
+
+              <button class="button button-form mobile-sticky-action" type="button" data-next-step>
+                Continue to donor details <span aria-hidden="true">→</span>
+              </button>
+            </div>
+
+            <div class="form-step-panel" data-step-panel="2" hidden>
+              <div class="field-row">
+                <label class="field">
+                  <span>Full name</span>
+                  <input name="fullName" type="text" autocomplete="name" required />
+                </label>
+                <label class="field">
+                  <span>Email address</span>
+                  <input name="email" type="email" autocomplete="email" required />
+                </label>
+              </div>
+              <div class="field-row">
+                <label class="field">
+                  <span>Telephone <small>Optional</small></span>
+                  <input name="phone" type="tel" autocomplete="tel" />
+                </label>
+                <label class="field">
+                  <span>Donor name display</span>
+                  <select name="recognition">
+                    <option value="Keep my gift private">Keep my gift private</option>
+                    <option value="May be acknowledged by name">May be acknowledged by name</option>
+                    <option value="Contact me before any acknowledgement">Contact me first</option>
+                  </select>
+                </label>
+              </div>
+
+              <label class="consent">
+                <input type="checkbox" name="consent" required />
+                <span>
+                  I confirm that this is an expression of interest. I consent to the Endowment Secretariat using these
+                  details to follow up on this pledge.
+                </span>
+              </label>
+
+              <div class="form-error" role="alert" aria-live="polite" data-form-error></div>
+              <div class="form-actions mobile-sticky-action">
+                <button class="back-button" type="button" data-previous-step>← Back</button>
+                <button class="button button-form" type="submit">
+                  Review pledge brief <span aria-hidden="true">↗</span>
+                </button>
+              </div>
+            </div>
+          </form>
+        </section>
+      </div>
+    </main>
+
+    <footer class="pledge-page-footer">
+      <span>© <span data-year></span> Igbajo Baptist Medical Centre</span>
+      <a href="../#governance">Review fund governance</a>
+    </footer>
+
+    <dialog class="pledge-dialog" id="pledge-dialog" aria-labelledby="dialog-title">
+      <div class="dialog-top">
+        <span class="dialog-mark" aria-hidden="true">+</span>
+        <button type="button" class="dialog-close" aria-label="Close pledge brief" data-dialog-close>×</button>
+      </div>
+      <p class="micro-label">Private pledge preview</p>
+      <h2 id="dialog-title">Your pledge brief is ready.</h2>
+      <p class="dialog-intro">
+        Review the summary below. No payment has been processed and nothing has been submitted.
+      </p>
+      <dl class="pledge-summary" data-pledge-summary></dl>
+      <p class="dialog-reference">Reference <strong data-pledge-reference></strong></p>
+      <div class="dialog-actions">
+        <button class="button button-primary" type="button" data-copy-pledge>Copy summary</button>
+        <button class="text-button" type="button" data-dialog-close>Return to pledge</button>
+      </div>
+      <p class="copy-status" role="status" aria-live="polite" data-copy-status></p>
+    </dialog>
+  </body>
+</html>

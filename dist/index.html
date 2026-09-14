@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="./site.css" />
     <script src="./site.js" defer></script>
   </head>
-  <body>
+  <body class="home-page">
     <a class="skip-link" href="#main">Skip to main content</a>
 
     <header class="site-header" data-header>
@@ -46,7 +46,7 @@
           <a href="#model">Fund model</a>
           <a href="#governance">Governance</a>
           <a href="#reporting">Reporting</a>
-          <a class="nav-cta" href="#pledge">Prepare a pledge</a>
+          <a class="nav-cta" href="./pledge/">Prepare a pledge</a>
         </nav>
       </div>
     </header>
@@ -62,7 +62,7 @@
               healthcare for Igbajo and more than 30 surrounding communities.
             </p>
             <div class="hero-actions">
-              <a class="button button-primary" href="#pledge">
+              <a class="button button-primary" href="./pledge/">
                 Prepare a pledge
                 <span aria-hidden="true">↗</span>
               </a>
@@ -202,7 +202,7 @@
             <span class="card-code">A</span>
             <h3>Cash gifts</h3>
             <p>One-time or scheduled pledges in NGN or USD, subject to approved payment and banking channels.</p>
-            <a href="#pledge">Prepare a cash pledge <span aria-hidden="true">→</span></a>
+            <a href="./pledge/">Prepare a cash pledge <span aria-hidden="true">→</span></a>
           </article>
           <article class="contribution-card">
             <span class="card-code">B</span>
@@ -314,19 +314,40 @@
         <div class="pledge-shell">
           <div class="pledge-copy">
             <p class="section-index light-index">06 / Pledge desk</p>
-            <h2 id="pledge-title">Begin with a clear intention.</h2>
+            <h2 id="pledge-title">A focused path from intention to stewardship.</h2>
             <p>
-              Prepare a contribution brief for the Endowment Secretariat. This private preview does not collect funds;
-              approved payment and bank details will be connected before public launch.
+              Continue to a dedicated, distraction-free pledge experience. You can review the complete brief before
+              anything is sent or any payment is requested.
             </p>
             <div class="pledge-assurance">
               <span>NGN & USD</span>
               <span>One-time or recurring</span>
               <span>Cash & non-cash</span>
             </div>
+            <a class="button button-primary pledge-direct-action" href="./pledge/">
+              Open the pledge desk <span aria-hidden="true">→</span>
+            </a>
           </div>
 
-          <form class="pledge-form" id="pledge-form" novalidate>
+          <div class="pledge-route-preview" aria-label="Pledge process overview">
+            <p class="micro-label">A guided process</p>
+            <ol>
+              <li>
+                <span>01</span>
+                <div><strong>Define the pledge</strong><p>Select the contribution type, value and timing.</p></div>
+              </li>
+              <li>
+                <span>02</span>
+                <div><strong>Confirm donor details</strong><p>Set contact and recognition preferences.</p></div>
+              </li>
+              <li>
+                <span>03</span>
+                <div><strong>Review before submission</strong><p>Receive a complete summary before the next step.</p></div>
+              </li>
+            </ol>
+          </div>
+
+          <form class="pledge-form" id="pledge-form" novalidate hidden>
             <div class="form-kicker">
               <span>Pledge brief</span>
               <span class="form-step">01 / 02</span>
@@ -451,7 +472,7 @@
         <a href="#mandate">Mandate</a>
         <a href="#governance">Governance</a>
         <a href="#reporting">Reporting</a>
-        <a href="#pledge">Pledge desk</a>
+        <a href="./pledge/">Pledge desk</a>
       </div>
       <p class="footer-legal">
         This is a private pre-launch website. Payment instructions, trustees’ contact details and formal policies must
@@ -481,5 +502,9 @@
       </div>
       <p class="copy-status" role="status" aria-live="polite" data-copy-status></p>
     </dialog>
+
+    <a class="mobile-pledge-bar" href="./pledge/" data-floating-cta>
+      <span>Prepare a pledge</span><span aria-hidden="true">→</span>
+    </a>
   </body>
 </html>
