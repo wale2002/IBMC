@@ -112,6 +112,12 @@ function verifyPaystackReference(reference) {
 }
 
 function reconcilePendingPayments() {
+  if (!isTrue_(getSetting_('PAYSTACK_ENABLED', 'FALSE'))) {
+    return { checked: 0, received: 0, pending: 0, failed: 0, skipped: true, reason: 'Paystack disabled' };
+  }
+  if (!getScriptProperty_('PAYSTACK_SECRET_KEY', '')) {
+    return { checked: 0, received: 0, pending: 0, failed: 0, skipped: true, reason: 'Paystack key not configured' };
+  }
   const pending = listObjects_(SHEETS.contributions)
     .filter(row => row.Gateway === 'Paystack' && ['Pending Payment', 'Payment Init Failed'].includes(row.Status))
     .slice(0, 25);

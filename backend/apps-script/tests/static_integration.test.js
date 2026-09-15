@@ -12,9 +12,11 @@ const manifest = JSON.parse(fs.readFileSync(path.join(root, 'appsscript.json'), 
 
 const functionNames = new Set(Array.from(scripts.matchAll(/function\s+([A-Za-z0-9_]+)\s*\(/g), match => match[1]));
 [
-  'doGet', 'submitPublicForm', 'setupSystem', 'installAutomation',
+  'doGet', 'doPost', 'submitPublicForm', 'setupSystem', 'installAutomation',
+  'installReminderAutomation', 'installPaystackReconciliation',
   'runDailyReminders', 'reconcilePendingPayments', 'verifySelectedPayment',
-  'confirmSelectedManualReceipt', 'approveSelectedAsset', 'acceptSelectedService'
+  'confirmSelectedManualReceipt', 'approveSelectedAsset', 'acceptSelectedService',
+  'notifyTrusteesOfSubmission_'
 ].forEach(name => assert(functionNames.has(name), `Missing Apps Script entry point: ${name}`));
 
 const ids = new Set(Array.from(html.matchAll(/\sid="([^"]+)"/g), match => match[1]));
@@ -22,6 +24,7 @@ Array.from(html.matchAll(/byId\('([^']+)'\)/g), match => match[1])
   .forEach(id => assert(ids.has(id), `Index.html references missing element id: ${id}`));
 
 assert(!/sk_(?:test|live)_[A-Za-z0-9]+/.test(scripts + html), 'A Paystack secret appears to be embedded in source');
+assert(/function reconcilePendingPayments\(\)[\s\S]*PAYSTACK_ENABLED/.test(scripts), 'Paystack reconciliation is not guarded by PAYSTACK_ENABLED');
 assert(manifest.oauthScopes.includes('https://www.googleapis.com/auth/spreadsheets'));
 assert(manifest.oauthScopes.includes('https://www.googleapis.com/auth/script.external_request'));
 assert(manifest.oauthScopes.includes('https://www.googleapis.com/auth/script.send_mail'));

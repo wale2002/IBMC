@@ -48,7 +48,7 @@ The public intake uses an Apps Script web page instead of Google Forms. This kee
    - Who has access: the public access option approved by the hospital
 
 9. Copy the deployment URL into the `WEB_APP_URL` Script Property, then create a new deployment version.
-10. Run `installAutomation`. It creates a daily reminder trigger and a six-hour Paystack reconciliation trigger.
+10. Run `installReminderAutomation`. It creates only the daily 08:00 reminder trigger. Paystack reconciliation remains off.
 11. Share the Google Sheet only with approved trustees and finance staff. Donors receive only the web-app URL.
 
 ## Paystack activation
@@ -62,6 +62,7 @@ Keep `PAYSTACK_ENABLED` set to `FALSE` until the hospital has completed Paystack
 5. Test a payment linked to a pledge and confirm that the oldest unpaid installment is updated first.
 6. Complete Paystack production activation and switch to the live secret key.
 7. Enable USD only after international payments and the required USD settlement account have been approved.
+8. Run `installPaystackReconciliation` only after `PAYSTACK_ENABLED` is `TRUE` and the secret key is configured.
 
 The Apps Script web-app request object does not provide the Paystack signature header needed for robust webhook verification. This MVP therefore verifies each trusted callback with Paystack's transaction API and polls unresolved payments every six hours. Move webhook processing to a small server or cloud function before high-volume use.
 

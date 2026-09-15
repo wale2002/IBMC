@@ -6,7 +6,7 @@ function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('IBMC Endowment')
     .addItem('Set up or repair workbook', 'setupSystem')
-    .addItem('Install daily automation', 'installAutomation')
+    .addItem('Install daily reminders', 'installReminderAutomation')
     .addSeparator()
     .addItem('Refresh dashboard', 'rebuildDashboard')
     .addItem('Verify selected Paystack payment', 'verifySelectedPayment')
@@ -131,15 +131,37 @@ function applySheetRules_() {
   });
 }
 
-function installAutomation() {
-  assertTrustee_();
-  const functions = new Set(['runDailyReminders', 'reconcilePendingPayments']);
+function removeTriggerHandlers_(handlerNames) {
+  const functions = new Set(handlerNames);
   ScriptApp.getProjectTriggers().forEach(trigger => {
     if (functions.has(trigger.getHandlerFunction())) ScriptApp.deleteTrigger(trigger);
   });
+}
+
+function installAutomation() {
+  return installReminderAutomation();
+}
+
+function installReminderAutomation() {
+  assertTrustee_();
+  removeTriggerHandlers_(['runDailyReminders', 'reconcilePendingPayments']);
   ScriptApp.newTrigger('runDailyReminders').timeBased().everyDays(1).atHour(8).create();
+  SpreadsheetApp.getUi().alert('Daily reminders installed for 08:00 Africa/Lagos. Paystack reconciliation remains disabled.');
+  return { reminders: true, paystackReconciliation: false };
+}
+
+function installPaystackReconciliation() {
+  assertTrustee_();
+  if (!isTrue_(getSetting_('PAYSTACK_ENABLED', 'FALSE'))) {
+    throw new Error('Paystack is disabled. Enable it only after account setup and payment acceptance testing.');
+  }
+  if (!getScriptProperty_('PAYSTACK_SECRET_KEY', '')) {
+    throw new Error('PAYSTACK_SECRET_KEY is not configured in Script Properties.');
+  }
+  removeTriggerHandlers_(['reconcilePendingPayments']);
   ScriptApp.newTrigger('reconcilePendingPayments').timeBased().everyHours(6).create();
-  SpreadsheetApp.getUi().alert('Automation installed: reminders run daily and pending Paystack payments reconcile every six hours.');
+  SpreadsheetApp.getUi().alert('Paystack reconciliation installed for every six hours.');
+  return { paystackReconciliation: true };
 }
 
 function rebuildDashboard() {

@@ -30,6 +30,45 @@ function sendEmailSafely_(recipient, subject, body, context) {
   }
 }
 
+function getTrusteeEmails_() {
+  return [...new Set(
+    getScriptProperty_('TRUSTEE_EMAILS', '')
+      .split(',')
+      .map(normalizeEmail_)
+      .filter(email => email && isValidEmail_(email))
+  )];
+}
+
+function notifyTrusteesOfSubmission_(result, donor) {
+  const recipients = getTrusteeEmails_();
+  if (!recipients.length) return { sent: 0, failed: 0, reason: 'No trustee emails configured' };
+
+  const subject = `New ${String(result.entityType || 'endowment').toLowerCase()} submission ${result.entityId}`;
+  const body = [
+    'A new submission has been recorded in the IBMC Endowment Fund register.',
+    '',
+    `Reference: ${result.entityId}`,
+    `Type: ${result.entityType}`,
+    `Donor: ${donor.fullName}`,
+    `Email: ${donor.email || 'Not provided'}`,
+    `Phone: ${donor.phone || 'Not provided'}`,
+    `Status: ${result.message}`,
+    '',
+    'Open the private trustee Google Sheet to review the record and audit history.'
+  ].join('\n');
+
+  const summary = { sent: 0, failed: 0 };
+  recipients.forEach(recipient => {
+    const sendResult = sendEmailSafely_(recipient, subject, body, {
+      entityType: result.entityType,
+      entityId: result.entityId
+    });
+    if (sendResult.sent) summary.sent += 1;
+    else summary.failed += 1;
+  });
+  return summary;
+}
+
 function runDailyReminders() {
   refreshInstallmentStatuses_();
   const reminderDays = Number(getSetting_('REMINDER_DAYS_BEFORE', '7')) || 7;

@@ -22,6 +22,49 @@ function doGet(e) {
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
+function doPost(e) {
+  const request = e && e.parameter ? e.parameter : {};
+  const nonce = sanitizeText_(request.nonce, 120);
+  let result;
+  try {
+    const payload = JSON.parse(String(request.payload || '{}'));
+    const submission = submitPublicForm(payload);
+    result = {
+      ok: Boolean(submission.ok),
+      message: sanitizeText_(submission.message, 500),
+      reference: sanitizeText_(submission.reference, 100),
+      redirectUrl: sanitizeText_(submission.redirectUrl, 500)
+    };
+  } catch (error) {
+    result = {
+      ok: false,
+      message: sanitizeText_(error && error.message ? error.message : 'The submission could not be recorded.', 500),
+      reference: '',
+      redirectUrl: ''
+    };
+  }
+  return renderPostMessageResponse_(nonce, result);
+}
+
+function renderPostMessageResponse_(nonce, result) {
+  const message = JSON.stringify({
+    source: 'ibmc-endowment-api',
+    nonce: sanitizeText_(nonce, 120),
+    result
+  })
+    .replace(/&/g, '\\u0026')
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
+  return HtmlService.createHtmlOutput(
+    `<!doctype html><html><head><meta charset="utf-8"></head><body>` +
+    `<script>window.parent.postMessage(${message}, '*');<\/script>` +
+    `<noscript>The submission response is ready. Return to the IBMC website.</noscript>` +
+    `</body></html>`
+  ).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
 function getPublicConfig_() {
   return {
     organisationName: getSetting_('ORGANISATION_NAME', 'Igbajo Baptist Medical Centre'),
@@ -90,6 +133,7 @@ function submitPublicForm(payload) {
       entityId: result.entityId
     });
   }
+  notifyTrusteesOfSubmission_(result, donorPayload);
 
   return {
     ok: true,
