@@ -1,0 +1,20 @@
+# Dependencies and local tooling
+node_modules/
+*.log
+
+# Local deployment/account metadata
+.vercel/
+.env
+.env.*
+!.env.example
+
+# Google/Apps Script credentials
+.clasprc.json
+credentials.json
+token.json
+*service-account*.json
+
+# Operating-system files
+.DS_Store
+Thumbs.db
+

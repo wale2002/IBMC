@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <style>
+    :root {
+      --ink: #162238;
+      --muted: #5e6b7c;
+      --navy: #17365d;
+      --navy-2: #214f83;
+      --pale: #edf4fb;
+      --line: #d7dee8;
+      --success: #166534;
+      --danger: #b42318;
+      --paper: #ffffff;
+      --page: #f4f7fa;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background: var(--page);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--page); }
+    .topbar { height: 7px; background: var(--navy); }
+    header { background: var(--paper); border-bottom: 1px solid var(--line); }
+    .header-inner, main, footer { width: min(1040px, calc(100% - 32px)); margin: 0 auto; }
+    .header-inner { padding: 30px 0 26px; }
+    .eyebrow { margin: 0 0 8px; color: var(--navy-2); font-size: 0.78rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(1.85rem, 4vw, 3rem); line-height: 1.08; letter-spacing: -.035em; color: #000; }
+    .intro { max-width: 760px; margin: 13px 0 0; color: var(--muted); line-height: 1.6; font-size: 1.02rem; }
+    main { padding: 28px 0 48px; display: grid; grid-template-columns: 250px 1fr; gap: 24px; align-items: start; }
+    .side { position: sticky; top: 18px; }
+    .side h2 { margin: 0 0 10px; font-size: .84rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+    .tabs { display: grid; gap: 8px; }
+    .tab { width: 100%; border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 8px; padding: 12px 14px; text-align: left; font: inherit; font-weight: 700; cursor: pointer; }
+    .tab:hover { border-color: var(--navy-2); }
+    .tab.active { background: var(--navy); border-color: var(--navy); color: #fff; }
+    .side-note { margin-top: 18px; color: var(--muted); font-size: .86rem; line-height: 1.55; }
+    .card { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: clamp(22px, 4vw, 38px); box-shadow: 0 10px 35px rgba(17, 34, 61, .06); }
+    h2 { color: #000; }
+    .card > h2 { margin: 0; font-size: 1.45rem; }
+    .section-intro { margin: 8px 0 26px; color: var(--muted); line-height: 1.55; }
+    fieldset { border: 0; margin: 0 0 30px; padding: 0; }
+    legend { width: 100%; padding: 0 0 10px; margin-bottom: 17px; border-bottom: 1px solid var(--line); font-size: 1rem; font-weight: 800; color: #000; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .span-2 { grid-column: 1 / -1; }
+    label { display: block; font-size: .89rem; font-weight: 700; margin-bottom: 7px; }
+    .hint { display: block; margin-top: 6px; color: var(--muted); font-size: .78rem; line-height: 1.35; }
+    input, select, textarea { width: 100%; border: 1px solid #bac6d4; border-radius: 7px; padding: 11px 12px; background: #fff; color: var(--ink); font: inherit; }
+    input:focus, select:focus, textarea:focus { outline: 3px solid rgba(33,79,131,.16); border-color: var(--navy-2); }
+    textarea { min-height: 92px; resize: vertical; line-height: 1.45; }
+    .panel[hidden] { display: none; }
+    .notice { border-left: 4px solid var(--navy-2); background: var(--pale); padding: 13px 15px; color: #2c4766; line-height: 1.5; font-size: .9rem; margin-bottom: 20px; }
+    .consent { display: grid; grid-template-columns: 22px 1fr; align-items: start; gap: 9px; margin: 12px 0 22px; }
+    .consent input { width: 18px; height: 18px; margin-top: 2px; }
+    .consent label { margin: 0; font-weight: 500; line-height: 1.5; }
+    a { color: var(--navy-2); }
+    .actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    button[type="submit"] { border: 0; border-radius: 8px; background: var(--navy); color: #fff; padding: 13px 21px; font: inherit; font-weight: 800; cursor: pointer; }
+    button[type="submit"]:hover { background: #0f2948; }
+    button[disabled] { opacity: .6; cursor: wait; }
+    .website-field { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; }
+    .status { min-height: 24px; font-weight: 650; line-height: 1.45; }
+    .status.success { color: var(--success); }
+    .status.error { color: var(--danger); }
+    footer { padding: 0 0 38px; color: var(--muted); font-size: .82rem; line-height: 1.55; }
+    @media (max-width: 780px) {
+      main { grid-template-columns: 1fr; }
+      .side { position: static; }
+      .tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .tab { text-align: center; }
+    }
+    @media (max-width: 590px) {
+      .header-inner, main, footer { width: min(100% - 22px, 1040px); }
+      .grid { grid-template-columns: 1fr; }
+      .span-2 { grid-column: auto; }
+      .tabs { grid-template-columns: 1fr; }
+      .card { padding: 21px 17px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar"></div>
+  <header>
+    <div class="header-inner">
+      <p class="eyebrow">Endowment Fund</p>
+      <h1 id="organisationName"></h1>
+      <p class="intro" id="intro"></p>
+    </div>
+  </header>
+
+  <main>
+    <aside class="side" aria-label="Contribution type">
+      <h2>Choose an action</h2>
+      <div class="tabs" role="tablist">
+        <button class="tab active" type="button" data-kind="donation" role="tab" aria-selected="true">Donate now</button>
+        <button class="tab" type="button" data-kind="pledge" role="tab" aria-selected="false">Make a pledge</button>
+        <button class="tab" type="button" data-kind="asset" role="tab" aria-selected="false">Offer an asset</button>
+        <button class="tab" type="button" data-kind="service" role="tab" aria-selected="false">Offer time or expertise</button>
+      </div>
+      <p class="side-note" id="contactLine"></p>
+    </aside>
+
+    <section class="card">
+      <h2 id="formTitle">Make a donation</h2>
+      <p class="section-intro" id="formIntro">Record an immediate cash donation. A receipt is issued after the payment is verified.</p>
+
+      <form id="contributionForm">
+        <input type="hidden" id="kind" value="donation">
+        <div class="website-field" aria-hidden="true">
+          <label for="website">Website</label>
+          <input id="website" name="website" tabindex="-1" autocomplete="off">
+        </div>
+        <fieldset>
+          <legend>Your details</legend>
+          <div class="grid">
+            <div>
+              <label for="fullName">Full name</label>
+              <input id="fullName" name="fullName" autocomplete="name" maxlength="160" required>
+            </div>
+            <div>
+              <label for="organisation">Organisation <span class="hint">Optional</span></label>
+              <input id="organisation" name="organisation" autocomplete="organization" maxlength="160">
+            </div>
+            <div>
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" autocomplete="email" maxlength="254">
+            </div>
+            <div>
+              <label for="phone">Phone or WhatsApp number</label>
+              <input id="phone" name="phone" autocomplete="tel" maxlength="40">
+              <span class="hint">Provide an email or phone number.</span>
+            </div>
+            <div>
+              <label for="country">Country</label>
+              <input id="country" name="country" autocomplete="country-name" value="Nigeria" maxlength="80">
+            </div>
+            <div>
+              <label for="preferredCommunication">Preferred communication</label>
+              <select id="preferredCommunication" name="preferredCommunication">
+                <option>Email</option><option>WhatsApp</option><option>Phone</option>
+              </select>
+            </div>
+            <div class="span-2">
+              <label for="address">Address <span class="hint">Optional</span></label>
+              <textarea id="address" name="address" autocomplete="street-address" maxlength="300"></textarea>
+            </div>
+          </div>
+        </fieldset>
+
+        <div id="panel-donation" class="panel">
+          <fieldset>
+            <legend>Donation details</legend>
+            <div class="notice" id="paymentNotice"></div>
+            <div class="grid">
+              <div>
+                <label for="donationAmount">Amount</label>
+                <input id="donationAmount" type="number" min="0.01" step="0.01" inputmode="decimal">
+              </div>
+              <div>
+                <label for="donationCurrency">Currency</label>
+                <select id="donationCurrency"></select>
+              </div>
+              <div>
+                <label for="paymentMethod">Payment method</label>
+                <select id="paymentMethod"></select>
+              </div>
+              <div>
+                <label for="pledgeId">Pledge reference <span class="hint">Optional</span></label>
+                <input id="pledgeId" maxlength="80" placeholder="PLG-YYYYMMDD-...">
+              </div>
+              <div class="span-2">
+                <label for="donationPurpose">Purpose restriction <span class="hint">Optional and subject to trustee acceptance</span></label>
+                <textarea id="donationPurpose" maxlength="500"></textarea>
+              </div>
+              <div class="span-2">
+                <label for="donationEvidence">Payment evidence link <span class="hint">Optional for bank transfer; use a share link without public edit access</span></label>
+                <input id="donationEvidence" type="url" maxlength="500" placeholder="https://">
+              </div>
+              <div class="span-2">
+                <label for="donationNotes">Notes <span class="hint">Optional</span></label>
+                <textarea id="donationNotes" maxlength="1000"></textarea>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+
+        <div id="panel-pledge" class="panel" hidden>
+          <fieldset>
+            <legend>Pledge details</legend>
+            <div class="grid">
+              <div><label for="pledgeTotal">Total commitment</label><input id="pledgeTotal" type="number" min="0.01" step="0.01"></div>
+              <div><label for="pledgeCurrency">Currency</label><input id="pledgeCurrency" value="NGN" maxlength="3" pattern="[A-Za-z]{3}"></div>
+              <div>
+                <label for="frequency">Frequency</label>
+                <select id="frequency"><option>One-off</option><option>Monthly</option><option>Quarterly</option><option>Annually</option></select>
+              </div>
+              <div><label for="installmentAmount">Amount per installment</label><input id="installmentAmount" type="number" min="0.01" step="0.01"></div>
+              <div><label for="startDate">Start date</label><input id="startDate" type="date"></div>
+              <div><label for="endDate">End date <span class="hint">Optional if the installment amount covers the total</span></label><input id="endDate" type="date"></div>
+              <div class="span-2"><label for="pledgePurpose">Purpose restriction <span class="hint">Optional and subject to trustee acceptance</span></label><textarea id="pledgePurpose" maxlength="500"></textarea></div>
+              <div class="span-2"><label for="pledgeConditions">Conditions <span class="hint">Optional</span></label><textarea id="pledgeConditions" maxlength="1000"></textarea></div>
+            </div>
+          </fieldset>
+        </div>
+
+        <div id="panel-asset" class="panel" hidden>
+          <fieldset>
+            <legend>Asset details</legend>
+            <div class="notice">Submission does not transfer ownership or confirm acceptance. Trustees must complete valuation, title, legal, and policy checks.</div>
+            <div class="grid">
+              <div>
+                <label for="assetType">Asset type</label>
+                <select id="assetType"><option>Equipment</option><option>Land</option><option>Building</option><option>Shares or securities</option><option>Other</option></select>
+              </div>
+              <div><label for="assetValue">Estimated value <span class="hint">Optional</span></label><input id="assetValue" type="number" min="0.01" step="0.01"></div>
+              <div><label for="assetCurrency">Valuation currency <span class="hint">Optional</span></label><input id="assetCurrency" value="NGN" maxlength="3" pattern="[A-Za-z]{3}"></div>
+              <div class="span-2"><label for="assetDescription">Description</label><textarea id="assetDescription" maxlength="1000"></textarea></div>
+              <div class="span-2"><label for="ownershipDetails">Ownership details</label><textarea id="ownershipDetails" maxlength="1000"></textarea></div>
+              <div class="span-2"><label for="assetEvidence">Supporting document link <span class="hint">Optional</span></label><input id="assetEvidence" type="url" maxlength="500" placeholder="https://"></div>
+              <div class="span-2"><label for="assetConditions">Conditions <span class="hint">Optional</span></label><textarea id="assetConditions" maxlength="1000"></textarea></div>
+            </div>
+          </fieldset>
+        </div>
+
+        <div id="panel-service" class="panel" hidden>
+          <fieldset>
+            <legend>Time or expertise</legend>
+            <div class="grid">
+              <div class="span-2"><label for="skillOffered">Skill or service offered</label><input id="skillOffered" maxlength="200" placeholder="For example, accounting, medical outreach, legal advice, or training"></div>
+              <div><label for="hoursOffered">Hours offered</label><input id="hoursOffered" type="number" min="0.5" step="0.5"></div>
+              <div><label for="availability">Availability</label><input id="availability" maxlength="500" placeholder="Days, dates, or time window"></div>
+              <div class="span-2"><label for="serviceConditions">Conditions <span class="hint">Optional</span></label><textarea id="serviceConditions" maxlength="1000"></textarea></div>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="consent">
+          <input id="consent" type="checkbox" required>
+          <label for="consent">I consent to IBMC using these details to administer this donation, pledge, asset, or service offer and to contact me about it. <a id="privacyLink" target="_blank" rel="noopener" hidden>Read the privacy notice</a></label>
+        </div>
+        <div class="actions">
+          <button id="submitButton" type="submit">Submit donation</button>
+          <div id="status" class="status" role="status" aria-live="polite"></div>
+        </div>
+      </form>
+    </section>
+  </main>
+  <footer id="footerText"></footer>
+
+  <script>
+    const CONFIG = <?!= publicConfigJson ?>;
+    const TITLES = {
+      donation: ['Make a donation', 'Record an immediate cash donation. A receipt is issued after the payment is verified.', 'Submit donation'],
+      pledge: ['Make a pledge', 'Set the total commitment and a practical payment schedule.', 'Submit pledge'],
+      asset: ['Offer an asset', 'Submit an asset for trustee due diligence and formal acceptance.', 'Submit asset offer'],
+      service: ['Offer time or expertise', 'Record professional services or volunteer time for trustee review.', 'Submit service offer']
+    };
+
+    const byId = id => document.getElementById(id);
+    byId('organisationName').textContent = CONFIG.organisationName;
+    byId('intro').textContent = CONFIG.intro;
+    byId('footerText').textContent = [CONFIG.contactEmail, CONFIG.contactPhone].filter(Boolean).join('  |  ');
+    byId('contactLine').textContent = CONFIG.contactEmail
+      ? `Questions: ${CONFIG.contactEmail}`
+      : 'Contact the Endowment Fund trustees if you need assistance.';
+
+    const privacyLink = byId('privacyLink');
+    if (CONFIG.privacyNoticeUrl) {
+      privacyLink.href = CONFIG.privacyNoticeUrl;
+      privacyLink.hidden = false;
+    }
+
+    const currencies = CONFIG.allowedCurrencies.length ? CONFIG.allowedCurrencies : ['NGN'];
+    currencies.forEach(currency => {
+      const option = document.createElement('option');
+      option.value = currency; option.textContent = currency;
+      if (currency === CONFIG.defaultCurrency) option.selected = true;
+      byId('donationCurrency').appendChild(option);
+    });
+
+    if (CONFIG.paystackEnabled) {
+      const option = document.createElement('option');
+      option.value = 'Paystack'; option.textContent = 'Pay online with Paystack';
+      byId('paymentMethod').appendChild(option);
+    }
+    const bankOption = document.createElement('option');
+    bankOption.value = 'Bank transfer'; bankOption.textContent = 'Bank transfer or offline payment';
+    byId('paymentMethod').appendChild(bankOption);
+    byId('paymentNotice').textContent = CONFIG.paystackEnabled
+      ? 'Online payment is available for the listed currencies. Bank transfers are recorded now and verified by a trustee.'
+      : (CONFIG.bankTransferInstructions || 'Online payment is not yet enabled. Submit the donation record and contact the trustees for payment instructions.');
+
+    const today = new Date();
+    const yyyyMmDd = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    byId('startDate').value = yyyyMmDd;
+
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => selectKind(tab.dataset.kind));
+    });
+
+    function selectKind(kind) {
+      byId('kind').value = kind;
+      document.querySelectorAll('.tab').forEach(tab => {
+        const active = tab.dataset.kind === kind;
+        tab.classList.toggle('active', active);
+        tab.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      document.querySelectorAll('.panel').forEach(panel => { panel.hidden = panel.id !== `panel-${kind}`; });
+      const [title, intro, button] = TITLES[kind];
+      byId('formTitle').textContent = title;
+      byId('formIntro').textContent = intro;
+      byId('submitButton').textContent = button;
+      byId('status').textContent = '';
+      document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    byId('frequency').addEventListener('change', event => {
+      const oneOff = event.target.value === 'One-off';
+      byId('installmentAmount').disabled = oneOff;
+      if (oneOff) byId('installmentAmount').value = byId('pledgeTotal').value;
+    });
+    byId('installmentAmount').disabled = true;
+    byId('pledgeTotal').addEventListener('input', () => {
+      if (byId('frequency').value === 'One-off') byId('installmentAmount').value = byId('pledgeTotal').value;
+    });
+
+    byId('contributionForm').addEventListener('submit', event => {
+      event.preventDefault();
+      const status = byId('status');
+      const button = byId('submitButton');
+      status.className = 'status';
+      status.textContent = 'Submitting...';
+      button.disabled = true;
+      const payload = buildPayload();
+      google.script.run
+        .withSuccessHandler(result => {
+          const submittedKind = byId('kind').value;
+          const successText = `${result.message} Reference: ${result.reference}`;
+          button.disabled = false;
+          if (result.redirectUrl) {
+            status.className = 'status success';
+            status.textContent = successText;
+            window.top.location.href = result.redirectUrl;
+          }
+          else {
+            byId('contributionForm').reset();
+            byId('startDate').value = yyyyMmDd;
+            selectKind(submittedKind);
+            status.className = 'status success';
+            status.textContent = successText;
+          }
+        })
+        .withFailureHandler(error => {
+          status.className = 'status error';
+          status.textContent = error && error.message ? error.message : 'The submission could not be saved.';
+          button.disabled = false;
+        })
+        .submitPublicForm(payload);
+    });
+
+    function buildPayload() {
+      const kind = byId('kind').value;
+      const donor = {
+        fullName: byId('fullName').value,
+        organisation: byId('organisation').value,
+        email: byId('email').value,
+        phone: byId('phone').value,
+        country: byId('country').value,
+        address: byId('address').value,
+        preferredCommunication: byId('preferredCommunication').value,
+        consent: byId('consent').checked
+      };
+      const detailBuilders = {
+        donation: () => ({
+          amount: byId('donationAmount').value, currency: byId('donationCurrency').value,
+          paymentMethod: byId('paymentMethod').value, pledgeId: byId('pledgeId').value,
+          purposeRestriction: byId('donationPurpose').value, evidenceUrl: byId('donationEvidence').value,
+          notes: byId('donationNotes').value
+        }),
+        pledge: () => ({
+          totalAmount: byId('pledgeTotal').value, currency: byId('pledgeCurrency').value,
+          frequency: byId('frequency').value, installmentAmount: byId('installmentAmount').value,
+          startDate: byId('startDate').value, endDate: byId('endDate').value,
+          purposeRestriction: byId('pledgePurpose').value, conditions: byId('pledgeConditions').value
+        }),
+        asset: () => ({
+          assetType: byId('assetType').value, description: byId('assetDescription').value,
+          estimatedValue: byId('assetValue').value, currency: byId('assetCurrency').value,
+          ownershipDetails: byId('ownershipDetails').value, evidenceUrl: byId('assetEvidence').value,
+          conditions: byId('assetConditions').value
+        }),
+        service: () => ({
+          skillOffered: byId('skillOffered').value, hoursOffered: byId('hoursOffered').value,
+          availability: byId('availability').value, conditions: byId('serviceConditions').value
+        })
+      };
+      return { kind, donor, details: detailBuilders[kind](), website: byId('website').value };
+    }
+  </script>
+</body>
+</html>
