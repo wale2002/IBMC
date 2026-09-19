@@ -299,6 +299,15 @@ img {
   background: #d7a06b;
 }
 
+.button-dark {
+  color: #fff;
+  background: var(--ink);
+}
+
+.button-dark:hover {
+  background: #12324f;
+}
+
 .text-link {
   color: var(--white);
   font-size: 0.9rem;
@@ -1459,6 +1468,17 @@ fieldset legend {
   margin: 0.35rem 0 0;
   font-size: 0.8rem;
   line-height: 1.55;
+}
+
+.intake-status-action {
+  display: inline-flex;
+  margin-top: 1rem;
+  padding: 0.75rem 0.9rem;
+  font-size: 0.72rem;
+}
+
+[data-live-only][hidden] {
+  display: none;
 }
 
 .pledge-next {
