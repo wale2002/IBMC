@@ -155,23 +155,43 @@ function findDonor_(email, phone) {
 }
 
 function upsertDonor_(donorPayload, actor) {
-  const existing = findDonor_(donorPayload.email, donorPayload.phone);
+  const normalizedEmail = normalizeEmail_(donorPayload.email);
+  const normalizedPhone = normalizePhone_(donorPayload.phone);
+  const donors = listObjects_(SHEETS.donors);
+  const emailMatch = normalizedEmail
+    ? donors.find(donor => normalizeEmail_(donor.Email) === normalizedEmail) || null
+    : null;
+  const phoneMatch = normalizedPhone
+    ? donors.find(donor => normalizePhone_(donor.Phone) === normalizedPhone) || null
+    : null;
+  if (emailMatch && phoneMatch && emailMatch['Donor ID'] !== phoneMatch['Donor ID']) {
+    throw new Error('These contact details could not be matched safely. Contact the trustees for help.');
+  }
+  const existing = emailMatch || phoneMatch;
   const now = new Date();
   if (existing) {
     const updates = {
       'Updated At': now,
-      'Full Name': existing['Full Name'] || donorPayload.fullName,
-      'Email': existing.Email || donorPayload.email,
-      'Phone': existing.Phone || donorPayload.phone,
-      'Address': existing.Address || donorPayload.address,
-      'Country': existing.Country || donorPayload.country,
-      'Organisation': existing.Organisation || donorPayload.organisation,
-      'Preferred Communication': existing['Preferred Communication'] || donorPayload.preferredCommunication,
-      'Consent At': existing['Consent At'] || now,
-      'Status': existing.Status === 'Anonymised' ? 'Active' : (existing.Status || 'Active')
+      'Consent At': existing['Consent At'] || now
     };
+    // Public contact matching is not authentication. Trustees review changes
+    // before they replace an existing donor's contact or identity information.
+    const proposed = {
+      'Full Name': donorPayload.fullName, Email: normalizedEmail,
+      Phone: normalizedPhone, Address: donorPayload.address,
+      Country: donorPayload.country, Organisation: donorPayload.organisation,
+      'Preferred Communication': donorPayload.preferredCommunication
+    };
+    const changes = {};
+    Object.keys(proposed).forEach(key => {
+      if (proposed[key] && String(proposed[key]) !== String(existing[key] || '')) changes[key] = proposed[key];
+    });
     const updated = updateObjectRow_(SHEETS.donors, existing._row, updates);
-    audit_('MATCH', 'Donor', existing['Donor ID'], 'Matched submission to an existing donor; existing contact fields were preserved', existing, updated, actor);
+    if (Object.keys(changes).length) {
+      audit_('CONTACT_REVIEW_REQUESTED', 'Donor', existing['Donor ID'], 'Trustee review required for submitted contact changes', existing, changes, actor);
+    } else {
+      audit_('MATCH', 'Donor', existing['Donor ID'], 'Matched submission to an existing donor', existing, updated, actor);
+    }
     return updated;
   }
 
