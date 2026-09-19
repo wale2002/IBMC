@@ -15,6 +15,7 @@
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23071b2d'/%3E%3Cpath d='M27 13h10v14h14v10H37v14H27V37H13V27h14z' fill='%23c78b52'/%3E%3C/svg%3E"
     />
     <link rel="stylesheet" href="../site.css" />
+    <script src="../runtime-config.js"></script>
     <script src="../site.js" defer></script>
   </head>
   <body class="pledge-page-body">
@@ -43,11 +44,14 @@
             brief before proceeding.
           </p>
 
-          <div class="pledge-status-note">
-            <strong>No payment is collected here.</strong>
-            <p>
+          <div class="pledge-status-note" data-intake-status>
+            <strong data-intake-status-title>No payment is collected here.</strong>
+            <p data-intake-status-copy>
               Approved banking and payment channels will be connected after IBMC completes its pre-launch review.
             </p>
+            <a class="button button-dark intake-status-action" href="#" data-live-intake data-live-only hidden>
+              Open the secure contribution form <span aria-hidden="true">↗</span>
+            </a>
           </div>
 
           <div class="pledge-next">
@@ -66,7 +70,7 @@
               <p>Contribution brief</p>
               <span>Review before proceeding</span>
             </div>
-            <span class="workspace-secure">Pre-launch</span>
+            <span class="workspace-secure" data-intake-badge>Pre-launch</span>
           </div>
 
           <div class="step-progress" aria-hidden="true"><span data-step-progress></span></div>
@@ -201,6 +205,7 @@
       <p class="dialog-reference">Reference <strong data-pledge-reference></strong></p>
       <div class="dialog-actions">
         <button class="button button-primary" type="button" data-copy-pledge>Copy summary</button>
+        <a class="button button-dark" href="#" data-live-intake data-live-only hidden>Continue to secure form</a>
         <button class="text-button" type="button" data-dialog-close>Return to pledge</button>
       </div>
       <p class="copy-status" role="status" aria-live="polite" data-copy-status></p>
