@@ -49,6 +49,11 @@
     input, select, textarea { width: 100%; border: 1px solid #bac6d4; border-radius: 7px; padding: 11px 12px; background: #fff; color: var(--ink); font: inherit; }
     input:focus, select:focus, textarea:focus { outline: 3px solid rgba(33,79,131,.16); border-color: var(--navy-2); }
     textarea { min-height: 92px; resize: vertical; line-height: 1.45; }
+    input[type="file"] { padding: 9px; min-height: 46px; }
+    input[type="file"]::file-selector-button { border: 0; border-radius: 6px; background: var(--pale); color: var(--navy); padding: 9px 12px; margin-right: 10px; font: inherit; font-weight: 750; cursor: pointer; }
+    .file-upload { border: 1px dashed #9eb0c4; border-radius: 9px; background: #f8fafc; padding: 14px; }
+    .file-upload label { margin-bottom: 9px; }
+    .file-help { display: block; margin-top: 7px; color: var(--muted); font-size: .8rem; line-height: 1.45; }
     .panel[hidden] { display: none; }
     .notice { border-left: 4px solid var(--navy-2); background: var(--pale); padding: 13px 15px; color: #2c4766; line-height: 1.5; font-size: .9rem; margin-bottom: 20px; }
     .consent { display: grid; grid-template-columns: 22px 1fr; align-items: start; gap: 9px; margin: 12px 0 22px; }
@@ -65,17 +70,25 @@
     .status.error { color: var(--danger); }
     footer { padding: 0 0 38px; color: var(--muted); font-size: .82rem; line-height: 1.55; }
     @media (max-width: 780px) {
-      main { grid-template-columns: 1fr; }
-      .side { position: static; }
-      .tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .tab { text-align: center; }
+      .header-inner { padding: 23px 0 20px; }
+      main { grid-template-columns: 1fr; padding-top: 16px; gap: 15px; }
+      .side { position: static; min-width: 0; }
+      .tabs { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 8px; scroll-snap-type: x proximity; scrollbar-width: thin; }
+      .tab { flex: 0 0 auto; min-width: 142px; min-height: 46px; text-align: center; scroll-snap-align: start; }
+      .side-note { margin: 7px 2px 0; }
     }
     @media (max-width: 590px) {
-      .header-inner, main, footer { width: min(100% - 22px, 1040px); }
+      .header-inner, footer { width: min(100% - 24px, 1040px); }
+      main { width: 100%; }
+      .side { padding: 0 12px; }
       .grid { grid-template-columns: 1fr; }
       .span-2 { grid-column: auto; }
-      .tabs { grid-template-columns: 1fr; }
-      .card { padding: 21px 17px; }
+      .card { padding: 22px 16px 26px; border-left: 0; border-right: 0; border-radius: 0; box-shadow: none; }
+      input, select, textarea { min-height: 46px; font-size: 16px; }
+      .actions { align-items: stretch; }
+      button[type="submit"] { width: 100%; min-height: 48px; }
+      .status { width: 100%; }
+      footer { padding-bottom: max(28px, env(safe-area-inset-bottom)); }
     }
   </style>
 </head>
@@ -177,6 +190,11 @@
                 <label for="donationEvidence">Payment evidence link <span class="hint">Optional for bank transfer; use a share link without public edit access</span></label>
                 <input id="donationEvidence" type="url" maxlength="500" placeholder="https://">
               </div>
+              <div class="span-2 file-upload">
+                <label for="donationReceiptImage">Upload payment receipt image <span class="hint">Optional; take a photo or choose a JPEG, PNG, or WebP image</span></label>
+                <input id="donationReceiptImage" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" aria-describedby="donationReceiptHelp">
+                <span class="file-help" id="donationReceiptHelp">One image. It is optimised before upload and stored privately for trustee review.</span>
+              </div>
               <div class="span-2">
                 <label for="donationNotes">Notes <span class="hint">Optional</span></label>
                 <textarea id="donationNotes" maxlength="1000"></textarea>
@@ -218,6 +236,11 @@
               <div class="span-2"><label for="assetDescription">Description</label><textarea id="assetDescription" maxlength="1000"></textarea></div>
               <div class="span-2"><label for="ownershipDetails">Ownership details</label><textarea id="ownershipDetails" maxlength="1000"></textarea></div>
               <div class="span-2"><label for="assetEvidence">Supporting document link <span class="hint">Optional</span></label><input id="assetEvidence" type="url" maxlength="500" placeholder="https://"></div>
+              <div class="span-2 file-upload">
+                <label for="assetImages">Upload asset images <span class="hint">Optional; add clear photos showing the asset and its condition</span></label>
+                <input id="assetImages" type="file" accept="image/jpeg,image/png,image/webp" multiple aria-describedby="assetImagesHelp">
+                <span class="file-help" id="assetImagesHelp">Up to three images. They are optimised before upload and stored privately for trustee review.</span>
+              </div>
               <div class="span-2"><label for="assetConditions">Conditions <span class="hint">Optional</span></label><textarea id="assetConditions" maxlength="1000"></textarea></div>
             </div>
           </fieldset>
@@ -295,6 +318,75 @@
     const yyyyMmDd = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     byId('startDate').value = yyyyMmDd;
 
+    const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+    const MAX_SOURCE_IMAGE_BYTES = 10 * 1024 * 1024;
+    const MAX_UPLOAD_IMAGE_BYTES = 4 * 1024 * 1024;
+    const MAX_IMAGE_DIMENSION = 2000;
+
+    function updateFileSummary(inputId, helpId, limit) {
+      const input = byId(inputId);
+      const files = Array.from(input.files || []);
+      byId(helpId).textContent = files.length
+        ? `${files.length} image${files.length === 1 ? '' : 's'} selected: ${files.map(file => file.name).join(', ')}`
+        : `${limit === 1 ? 'One image' : `Up to ${limit} images`}. Images are optimised before upload and stored privately for trustee review.`;
+    }
+
+    byId('donationReceiptImage').addEventListener('change', () => updateFileSummary('donationReceiptImage', 'donationReceiptHelp', 1));
+    byId('assetImages').addEventListener('change', () => updateFileSummary('assetImages', 'assetImagesHelp', 3));
+
+    function readAsDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ''));
+        reader.onerror = () => reject(new Error(`Could not read ${file.name}.`));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function loadImage(dataUrl, fileName) {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error(`${fileName} is not a readable image.`));
+        image.src = dataUrl;
+      });
+    }
+
+    function canvasToBlob(canvas) {
+      return new Promise((resolve, reject) => {
+        canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('The image could not be optimised.')), 'image/jpeg', 0.86);
+      });
+    }
+
+    async function prepareImage(file) {
+      if (!IMAGE_TYPES.has(file.type)) throw new Error(`${file.name} must be a JPEG, PNG, or WebP image.`);
+      if (file.size > MAX_SOURCE_IMAGE_BYTES) throw new Error(`${file.name} is larger than 10 MB.`);
+      const source = await readAsDataUrl(file);
+      const image = await loadImage(source, file.name);
+      const scale = Math.min(1, MAX_IMAGE_DIMENSION / Math.max(image.naturalWidth, image.naturalHeight));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+      const context = canvas.getContext('2d');
+      context.fillStyle = '#ffffff';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      const blob = await canvasToBlob(canvas);
+      if (blob.size > MAX_UPLOAD_IMAGE_BYTES) throw new Error(`${file.name} remains larger than 4 MB after optimisation.`);
+      const dataUrl = await readAsDataUrl(blob);
+      return {
+        name: file.name.replace(/\.[^.]+$/, '').slice(0, 80) + '.jpg',
+        mimeType: 'image/jpeg',
+        base64: dataUrl.split(',')[1]
+      };
+    }
+
+    async function prepareImages(inputId, limit) {
+      const files = Array.from(byId(inputId).files || []);
+      if (files.length > limit) throw new Error(`Upload no more than ${limit} image${limit === 1 ? '' : 's'}.`);
+      return Promise.all(files.map(prepareImage));
+    }
+
     document.querySelectorAll('.tab').forEach(tab => {
       tab.addEventListener('click', () => selectKind(tab.dataset.kind));
     });
@@ -325,14 +417,23 @@
       if (byId('frequency').value === 'One-off') byId('installmentAmount').value = byId('pledgeTotal').value;
     });
 
-    byId('contributionForm').addEventListener('submit', event => {
+    byId('contributionForm').addEventListener('submit', async event => {
       event.preventDefault();
       const status = byId('status');
       const button = byId('submitButton');
       status.className = 'status';
-      status.textContent = 'Submitting...';
+      status.textContent = 'Preparing your submission...';
       button.disabled = true;
-      const payload = buildPayload();
+      let payload;
+      try {
+        payload = await buildPayload();
+      } catch (error) {
+        status.className = 'status error';
+        status.textContent = error && error.message ? error.message : 'The selected image could not be prepared.';
+        button.disabled = false;
+        return;
+      }
+      status.textContent = 'Submitting...';
       google.script.run
         .withSuccessHandler(result => {
           const submittedKind = byId('kind').value;
@@ -346,6 +447,8 @@
           else {
             byId('contributionForm').reset();
             byId('startDate').value = yyyyMmDd;
+            updateFileSummary('donationReceiptImage', 'donationReceiptHelp', 1);
+            updateFileSummary('assetImages', 'assetImagesHelp', 3);
             selectKind(submittedKind);
             status.className = 'status success';
             status.textContent = successText;
@@ -359,7 +462,7 @@
         .submitPublicForm(payload);
     });
 
-    function buildPayload() {
+    async function buildPayload() {
       const kind = byId('kind').value;
       const donor = {
         fullName: byId('fullName').value,
@@ -395,7 +498,13 @@
           availability: byId('availability').value, conditions: byId('serviceConditions').value
         })
       };
-      return { kind, donor, details: detailBuilders[kind](), website: byId('website').value };
+      const details = detailBuilders[kind]();
+      if (kind === 'donation') {
+        const receiptImages = await prepareImages('donationReceiptImage', 1);
+        details.receiptImage = receiptImages[0] || null;
+      }
+      if (kind === 'asset') details.assetImages = await prepareImages('assetImages', 3);
+      return { kind, donor, details, website: byId('website').value };
     }
   </script>
 </body>

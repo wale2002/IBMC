@@ -92,10 +92,135 @@ function rateLimitPublicSubmission_(email, phone) {
   cache.put(key, String(count + 1), 600);
 }
 
+const PUBLIC_IMAGE_UPLOAD = Object.freeze({
+  maxBytes: 4 * 1024 * 1024,
+  maxDonationImages: 1,
+  maxAssetImages: 3,
+  allowedMimeTypes: Object.freeze({
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'image/webp': 'webp'
+  })
+});
+
+function unsignedByte_(value) {
+  return value < 0 ? value + 256 : value;
+}
+
+function hasImageSignature_(bytes, mimeType) {
+  const valueAt = index => unsignedByte_(bytes[index] || 0);
+  if (mimeType === 'image/jpeg') {
+    return bytes.length >= 3 && valueAt(0) === 0xFF && valueAt(1) === 0xD8 && valueAt(2) === 0xFF;
+  }
+  if (mimeType === 'image/png') {
+    const signature = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+    return bytes.length >= signature.length && signature.every((value, index) => valueAt(index) === value);
+  }
+  if (mimeType === 'image/webp') {
+    const riff = [0x52, 0x49, 0x46, 0x46];
+    const webp = [0x57, 0x45, 0x42, 0x50];
+    return bytes.length >= 12
+      && riff.every((value, index) => valueAt(index) === value)
+      && webp.every((value, index) => valueAt(index + 8) === value);
+  }
+  return false;
+}
+
+function normalizeImageUpload_(upload, label) {
+  if (!upload || typeof upload !== 'object') throw new Error(`${label} is missing.`);
+  const mimeType = String(upload.mimeType || '').trim().toLowerCase();
+  const extension = PUBLIC_IMAGE_UPLOAD.allowedMimeTypes[mimeType];
+  if (!extension) throw new Error(`${label} must be a JPEG, PNG, or WebP image.`);
+
+  const base64 = String(upload.base64 || '').replace(/\s/g, '');
+  if (!base64 || !/^[A-Za-z0-9+/]+={0,2}$/.test(base64)) {
+    throw new Error(`${label} could not be read.`);
+  }
+  const padding = base64.endsWith('==') ? 2 : base64.endsWith('=') ? 1 : 0;
+  const estimatedBytes = Math.floor(base64.length * 3 / 4) - padding;
+  if (estimatedBytes > PUBLIC_IMAGE_UPLOAD.maxBytes) {
+    throw new Error(`${label} is larger than 4 MB after optimisation.`);
+  }
+
+  let bytes;
+  try {
+    bytes = Utilities.base64Decode(base64);
+  } catch (error) {
+    throw new Error(`${label} could not be decoded.`);
+  }
+  if (!bytes.length || bytes.length > PUBLIC_IMAGE_UPLOAD.maxBytes || !hasImageSignature_(bytes, mimeType)) {
+    throw new Error(`${label} is not a valid ${extension.toUpperCase()} image.`);
+  }
+  return { bytes, mimeType, extension };
+}
+
+function normalizeSubmissionImages_(kind, details) {
+  let rawImages = [];
+  let maxFiles = 0;
+  if (kind === 'donation' && details.receiptImage) {
+    rawImages = [details.receiptImage];
+    maxFiles = PUBLIC_IMAGE_UPLOAD.maxDonationImages;
+  } else if (kind === 'asset' && Array.isArray(details.assetImages)) {
+    rawImages = details.assetImages;
+    maxFiles = PUBLIC_IMAGE_UPLOAD.maxAssetImages;
+  }
+  if (rawImages.length > maxFiles) throw new Error(`Upload no more than ${maxFiles} image${maxFiles === 1 ? '' : 's'}.`);
+  return rawImages.map((upload, index) => normalizeImageUpload_(upload, `Image ${index + 1}`));
+}
+
+function getUploadRootFolder_() {
+  const properties = PropertiesService.getScriptProperties();
+  const configuredId = properties.getProperty('UPLOAD_FOLDER_ID');
+  let folder;
+  if (configuredId) {
+    try {
+      folder = DriveApp.getFolderById(configuredId);
+    } catch (error) {
+      console.warn(`Configured upload folder is unavailable: ${error.message || error}`);
+    }
+  }
+  if (!folder) {
+    folder = DriveApp.createFolder('IBMC Endowment Private Uploads');
+    properties.setProperty('UPLOAD_FOLDER_ID', folder.getId());
+  }
+  if (folder.getSharingAccess() !== DriveApp.Access.PRIVATE) {
+    throw new Error('The configured upload folder must use Restricted access before images can be accepted.');
+  }
+  return folder;
+}
+
+function getOrCreateUploadFolder_(parent, name) {
+  const existing = parent.getFoldersByName(name);
+  return existing.hasNext() ? existing.next() : parent.createFolder(name);
+}
+
+function storeSubmissionImages_(uploads, entityType, entityId) {
+  if (!uploads.length) return [];
+  const root = getUploadRootFolder_();
+  const typeFolder = getOrCreateUploadFolder_(root, entityType);
+  const entityFolder = getOrCreateUploadFolder_(typeFolder, entityId);
+  return uploads.map((upload, index) => {
+    const fileName = `${entityId}-${index + 1}.${upload.extension}`;
+    const blob = Utilities.newBlob(upload.bytes, upload.mimeType, fileName);
+    const file = entityFolder.createFile(blob);
+    file.setDescription(`Private ${entityType.toLowerCase()} evidence for ${entityId}`);
+    return file.getUrl();
+  });
+}
+
+function combineEvidenceUrls_(existingUrl, uploadedUrls) {
+  return [sanitizeText_(existingUrl, 500), ...uploadedUrls]
+    .filter(Boolean)
+    .join('\n')
+    .slice(0, 500);
+}
+
 function submitPublicForm(payload) {
   if (!payload || typeof payload !== 'object') throw new Error('Submission is missing.');
   const kind = requireText_(payload.kind, 'Submission type', 30).toLowerCase();
   if (sanitizeText_(payload.website, 200)) throw new Error('Submission could not be accepted.');
+  const details = payload.details || {};
+  const imageUploads = normalizeSubmissionImages_(kind, details);
   const donorPayload = validateDonorPayload_(payload.donor || {});
   rateLimitPublicSubmission_(donorPayload.email, donorPayload.phone);
   const lock = LockService.getScriptLock();
@@ -104,10 +229,10 @@ function submitPublicForm(payload) {
   try {
     const donor = upsertDonor_(donorPayload, 'public');
     switch (kind) {
-      case 'donation': result = createDonation_(donor, payload.details || {}); break;
-      case 'pledge': result = createPledge_(donor, payload.details || {}); break;
-      case 'asset': result = createAsset_(donor, payload.details || {}); break;
-      case 'service': result = createService_(donor, payload.details || {}); break;
+      case 'donation': result = createDonation_(donor, details, imageUploads); break;
+      case 'pledge': result = createPledge_(donor, details); break;
+      case 'asset': result = createAsset_(donor, details, imageUploads); break;
+      case 'service': result = createService_(donor, details); break;
       default: throw new Error('Unknown submission type.');
     }
   } finally {
@@ -143,7 +268,7 @@ function submitPublicForm(payload) {
   };
 }
 
-function createDonation_(donor, details) {
+function createDonation_(donor, details, imageUploads) {
   const amount = toPositiveNumber_(details.amount, 'Donation amount');
   const currency = validateCurrency_(details.currency, true);
   const paymentMethod = requireText_(details.paymentMethod, 'Payment method', 40);
@@ -158,6 +283,8 @@ function createDonation_(donor, details) {
   }
 
   const contributionId = generateId_(APP.idPrefixes.contribution);
+  const uploadedUrls = storeSubmissionImages_(imageUploads || [], 'Contributions', contributionId);
+  const evidenceUrl = combineEvidenceUrls_(details.evidenceUrl, uploadedUrls);
   const now = new Date();
   const record = {
     'Contribution ID': contributionId,
@@ -177,7 +304,7 @@ function createDonation_(donor, details) {
     'Gateway Fee': '',
     'Gateway Channel': '',
     'Purpose Restriction': sanitizeText_(details.purposeRestriction, 500),
-    'Evidence URL': sanitizeText_(details.evidenceUrl, 500),
+    'Evidence URL': evidenceUrl,
     'Notes': sanitizeText_(details.notes, 1000),
     'Updated At': now
   };
@@ -187,6 +314,7 @@ function createDonation_(donor, details) {
   return {
     entityType: 'Contribution',
     entityId: contributionId,
+    evidenceUrl,
     initialisePayment: paystackRequested,
     message: paystackRequested
       ? 'Your donation was recorded and is ready for online payment.'
@@ -271,8 +399,10 @@ function createPledge_(donor, details) {
   };
 }
 
-function createAsset_(donor, details) {
+function createAsset_(donor, details, imageUploads) {
   const assetId = generateId_(APP.idPrefixes.asset);
+  const uploadedUrls = storeSubmissionImages_(imageUploads || [], 'Assets', assetId);
+  const evidenceUrl = combineEvidenceUrls_(details.evidenceUrl, uploadedUrls);
   const now = new Date();
   const record = {
     'Asset ID': assetId,
@@ -283,7 +413,7 @@ function createAsset_(donor, details) {
     'Estimated Value': details.estimatedValue ? toPositiveNumber_(details.estimatedValue, 'Estimated value') : '',
     'Currency': details.currency ? validateCurrency_(details.currency, true) : '',
     'Ownership Details': sanitizeText_(details.ownershipDetails, 1000),
-    'Evidence URL': sanitizeText_(details.evidenceUrl, 500),
+    'Evidence URL': evidenceUrl,
     'Status': 'Pending Review',
     'Reviewer': '', 'Reviewed At': '', 'Transfer Date': '',
     'Conditions': sanitizeText_(details.conditions, 1000),
@@ -292,7 +422,7 @@ function createAsset_(donor, details) {
   appendObject_(SHEETS.assets, record);
   audit_('CREATE', 'Asset', assetId, 'Recorded asset offer for due diligence', '', record, 'public');
   return {
-    entityType: 'Asset', entityId: assetId,
+    entityType: 'Asset', entityId: assetId, evidenceUrl,
     message: 'Your asset offer was recorded for trustee review. Acceptance is subject to valuation and title checks.',
     emailTemplate: {
       subject: `Asset offer ${assetId}`,

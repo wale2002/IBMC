@@ -13,6 +13,8 @@ Record the tester, date, evidence link, and result for every case. Use fictional
 | DON 02 | Submit again with the same email and an updated phone | No duplicate donor is created. Existing contacts remain unchanged; `CONTACT_REVIEW_REQUESTED` captures proposed changes for trustee verification. |
 | DON 03 | Submit with neither email nor phone | Submission is rejected with a clear validation message. |
 | DON 04 | Submit without consent | Submission is rejected. |
+| DON 05 | Submit a bank-transfer donation with a receipt image | Image is stored in the private upload folder and its Drive link is written to `Evidence URL`. |
+| DON 06 | Upload a renamed non-image or an image larger than the limit | Submission is rejected without creating a contribution. |
 | PAY 01 | Start a valid NGN Paystack test donation | Contribution is `Pending Payment` and checkout opens. |
 | PAY 02 | Complete the Paystack test payment | Server-side verification confirms status, amount, and currency; contribution becomes `Received`; receipt is issued. |
 | PAY 03 | Return with an unknown or incomplete reference | No contribution is marked received. |
@@ -37,7 +39,9 @@ Record the tester, date, evidence link, and result for every case. Use fictional
 | WEB 02 | Configure the tested Apps Script /exec URL | Homepage contribution links and the pledge page open the configured form. No preview donor details appear in the URL. |
 | OPS 03 | Reinstall daily reminders with Paystack reconciliation already installed | One daily reminder trigger exists; the payment reconciliation trigger is preserved. |
 | AST 01 | Submit an asset offer | Status is `Pending Review`; acknowledgement does not claim acceptance or transfer. |
-| AST 02 | Approve the selected asset | Status becomes `Accepted`; reviewer, time, and audit event are recorded. |
+| AST 02 | Submit an asset offer with three photos | All images are privately stored and their links are available to trustees from the asset row. |
+| AST 03 | Try to attach more than three asset photos | The browser and server reject the submission. |
+| AST 04 | Approve the selected asset | Status becomes `Accepted`; reviewer, time, and audit event are recorded. |
 | SVC 01 | Submit and accept a service offer | Offer progresses from `Offered` to `Accepted` with an audit event. |
 | REP 01 | Record NGN and USD activity | Dashboard displays each currency separately and never adds them together. |
 | REP 02 | Add an investment-manager period row | Investment data stays separate from contribution receipts. |
