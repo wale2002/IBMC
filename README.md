@@ -6,6 +6,7 @@ A mobile-first website and pilot workflow for the Igbajo Baptist Medical Centre 
 
 - `dist/` — deployable static website for Vercel.
 - `backend/apps-script/` — Google Apps Script workflow for pledge registers, acknowledgements, reminders, trustee notifications, audit history, and Paystack reconciliation.
+- `dist/admin/` — same-domain trustee login gateway for the private Apps Script administration dashboard.
 - `vercel.json` — configures Vercel to publish `dist/`.
 
 ## Deployment
@@ -25,6 +26,8 @@ Then open `http://localhost:4173`.
 The website at [ibmc-pink.vercel.app](https://ibmc-pink.vercel.app/) currently presents a pledge preview and does not transmit donor data. The full intake under `backend/apps-script/` supports cash donations, scheduled pledges, assets, and services. Deploy it as a Google Apps Script web app to accept submissions into the private Google Sheet.
 
 After testing the Apps Script deployment, set `appsScriptWebAppUrl` in `dist/runtime-config.js` to its `https://script.google.com/macros/s/DEPLOYMENT_ID/exec` URL and redeploy Vercel. The homepage contribution links and pledge-page secure-form buttons will open that intake. A blank or invalid setting keeps the preview available. Donors enter their final details on the Google-hosted form; preview details are not passed in a URL. The Vercel website URL is not the Apps Script endpoint.
+
+Set `appsScriptAdminUrl` to the separately deployed, Google-authenticated `https://script.google.com/macros/s/DEPLOYMENT_ID/exec?view=admin` URL. The public site exposes only the trustee login gateway; every dashboard request is still checked against `TRUSTEE_EMAILS` by Apps Script.
 
 The test workspace uses safe defaults:
 
