@@ -10,6 +10,7 @@ node_modules/
 
 # Google/Apps Script credentials
 .clasprc.json
+.clasp.json
 credentials.json
 token.json
 *service-account*.json

@@ -2,14 +2,35 @@
  * Email acknowledgements and pledge reminders.
  */
 
+function auditEmailOutcome_(action, recipient, subject, context, reason) {
+  const safeContext = context || {};
+  try {
+    audit_(action, safeContext.entityType || 'Notification', safeContext.entityId || '', sanitizeText_(reason || maskEmail_(recipient), 500), '', {
+      recipient: maskEmail_(recipient),
+      subject: sanitizeText_(subject, 200)
+    }, 'system');
+  } catch (auditError) {
+    console.error(`Email audit failed: ${auditError.message || auditError}`);
+  }
+}
+
+function emailNotSent_(recipient, subject, context, reason) {
+  auditEmailOutcome_('EMAIL_NOT_SENT', recipient, subject, context, reason);
+  return { sent: false, reason };
+}
+
 function sendEmailSafely_(recipient, subject, body, context) {
   const email = normalizeEmail_(recipient);
-  if (!email || !isValidEmail_(email)) return { sent: false, reason: 'No valid email address' };
-  if (!isTrue_(getSetting_('AUTOMATIC_EMAILS', 'TRUE'))) return { sent: false, reason: 'Automatic emails disabled' };
-  if (MailApp.getRemainingDailyQuota() < 1) return { sent: false, reason: 'Daily email quota exhausted' };
-
+  if (!email || !isValidEmail_(email)) return emailNotSent_(email, subject, context, 'No valid email address');
+  let options;
   try {
-    const options = {
+    if (!isTrue_(getSetting_('AUTOMATIC_EMAILS', 'FALSE'))) {
+      return emailNotSent_(email, subject, context, 'Automatic emails disabled');
+    }
+    if (MailApp.getRemainingDailyQuota() < 1) {
+      return emailNotSent_(email, subject, context, 'Daily email quota exhausted');
+    }
+    options = {
       to: email,
       subject: sanitizeText_(subject, 200),
       body: String(body || ''),
@@ -18,16 +39,12 @@ function sendEmailSafely_(recipient, subject, body, context) {
     const replyTo = normalizeEmail_(getSetting_('CONTACT_EMAIL', ''));
     if (replyTo && isValidEmail_(replyTo)) options.replyTo = replyTo;
     MailApp.sendEmail(options);
-    audit_('EMAIL_SENT', context.entityType || 'Notification', context.entityId || '', maskEmail_(email), '', {
-      subject: options.subject
-    }, 'system');
-    return { sent: true };
   } catch (error) {
-    audit_('EMAIL_FAILED', context.entityType || 'Notification', context.entityId || '', sanitizeText_(error.message, 500), '', {
-      recipient: maskEmail_(email), subject: sanitizeText_(subject, 200)
-    }, 'system');
+    auditEmailOutcome_('EMAIL_FAILED', email, subject, context, error.message || 'Email failed');
     return { sent: false, reason: error.message || 'Email failed' };
   }
+  auditEmailOutcome_('EMAIL_SENT', email, options.subject, context, maskEmail_(email));
+  return { sent: true };
 }
 
 function getTrusteeEmails_() {
@@ -70,6 +87,26 @@ function notifyTrusteesOfSubmission_(result, donor) {
 }
 
 function runDailyReminders() {
+  assertTrustee_();
+  return runRemindersWithLock_();
+}
+
+// The private handler is available to installed triggers, not google.script.run.
+function runScheduledReminders_() {
+  return runRemindersWithLock_();
+}
+
+function runRemindersWithLock_() {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(25000);
+  try {
+    return runDailyReminders_();
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function runDailyReminders_() {
   refreshInstallmentStatuses_();
   const reminderDays = Number(getSetting_('REMINDER_DAYS_BEFORE', '7')) || 7;
   const overdueRepeatDays = Number(getSetting_('OVERDUE_REPEAT_DAYS', '14')) || 14;
@@ -95,6 +132,10 @@ function runDailyReminders() {
     const donor = donorsById[item['Donor ID']];
     const pledge = pledgesById[item['Pledge ID']];
     if (!donor || !pledge) { summary.failed += 1; return; }
+    if (donor.Status !== 'Active' || ['Paused', 'Cancelled', 'Lapsed', 'Fulfilled'].includes(pledge.Status)) {
+      summary.skipped += 1;
+      return;
+    }
     const preference = String(donor['Preferred Communication'] || 'Email');
     const subject = reminderType === 'Overdue'
       ? `Pledge installment overdue ${item['Pledge ID']}`
@@ -138,12 +179,14 @@ function runDailyReminders() {
       'Sent At': status === 'Sent' ? now : '',
       'Error': sanitizeText_(error, 500)
     });
-    updateObjectRow_(SHEETS.installments, item._row, {
-      'Last Reminder At': now,
-      'Reminder Count': (Number(item['Reminder Count']) || 0) + 1,
-      'Updated At': now
-    });
-    updateObjectRow_(SHEETS.pledges, pledge._row, { 'Last Reminder At': now, 'Updated At': now });
+    if (status === 'Sent' || status === 'Queued for manual follow-up') {
+      updateObjectRow_(SHEETS.installments, item._row, {
+        'Last Reminder At': now,
+        'Reminder Count': (Number(item['Reminder Count']) || 0) + 1,
+        'Updated At': now
+      });
+      updateObjectRow_(SHEETS.pledges, pledge._row, { 'Last Reminder At': now, 'Updated At': now });
+    }
   });
   audit_('REMINDER_RUN', 'System', 'reminders', JSON.stringify(summary), '', '', 'system');
   return summary;

@@ -48,8 +48,11 @@ The public intake uses an Apps Script web page instead of Google Forms. This kee
    - Who has access: the public access option approved by the hospital
 
 9. Copy the deployment URL into the `WEB_APP_URL` Script Property, then create a new deployment version.
-10. Run `installReminderAutomation`. It creates only the daily 08:00 reminder trigger. Paystack reconciliation remains off.
+10. When ready, run `installReminderAutomation`. It creates the private `runScheduledReminders_` daily trigger for the 08:00 hour. It replaces any older reminder trigger and preserves existing Paystack reconciliation triggers. The installing account must be an authorised trustee.
 11. Share the Google Sheet only with approved trustees and finance staff. Donors receive only the web-app URL.
+12. Set the tested `/exec` deployment URL in `dist/runtime-config.js` and publish the website update. Vercel does not deploy the Apps Script code. New Apps Script versions must be deployed separately.
+
+For an existing project, update the script files and manifest, authorise the added `userinfo.email` scope for trustee identity checks, and create a new deployment version. Existing sheet records and settings are preserved. New workbooks default `AUTOMATIC_EMAILS` to `FALSE`; enable it explicitly when ready. If using clasp, copy `.clasp.json.example` to `.clasp.json` and supply the existing project ID. Inspect the upload list before pushing; keep credentials outside the repository.
 
 ## Paystack activation
 
@@ -74,6 +77,8 @@ The Apps Script web-app request object does not provide the Paystack signature h
 - **Service:** confirm that the offer matches an approved need before accepting and scheduling it.
 - **WhatsApp or phone preference:** reminders appear in `Reminders` as `Queued for manual follow-up`. The MVP does not claim free automated WhatsApp messaging.
 - **Investment reporting:** the appointed manager or trustee records period-end values in `Investments`. Donation receipts and investment values remain separate ledgers.
+- **Contact changes:** repeat public submissions preserve existing donor details and log proposed differences as `CONTACT_REVIEW_REQUESTED` in `AuditLog`. Trustees verify the request before updating the donor row. Conflicting email/phone matches are rejected.
+- **Email follow-up:** filter `AuditLog` for `EMAIL_NOT_SENT` and `EMAIL_FAILED`, or `Reminders` for `Failed`. Use the entity ID to find the record for manual follow-up. Failed reminders remain eligible on the next run. Paused or closed pledges and inactive donors are excluded.
 
 ## Controls before launch
 
@@ -91,14 +96,11 @@ The Apps Script web-app request object does not provide the Paystack signature h
 Run the included domain tests with Node.js:
 
 ```powershell
-node tests/domain.test.js
-node tests/ledger.test.js
-node tests/syntax.test.js
-node tests/static_integration.test.js
+node --test tests/*.test.js
 ```
 
 The tests cover input normalisation, formula-injection protection, schedule generation, date clamping, amount conversion, pledge status calculations, entry-point wiring, HTML field references, manifest scopes, and accidental secret inclusion. Google service calls and Paystack calls require a deployed Apps Script test environment and a Paystack test key.
 
 ## Pilot exit criteria
 
-The pilot is ready for controlled launch when all tests in `ACCEPTANCE_TESTS.md` pass, the client inputs in `CLIENT_REVIEW_AND_EXECUTION_PLAN.md` are supplied, trustees are trained, and the board-approved governance documents are in place.
+The pilot is ready for controlled launch when the deployed tests in `ACCEPTANCE_TESTS.md` pass, the contact and payment settings above are supplied, trustees are trained, and the board-approved governance documents are in place.

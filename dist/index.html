@@ -15,6 +15,7 @@
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23071b2d'/%3E%3Cpath d='M27 13h10v14h14v10H37v14H27V37H13V27h14z' fill='%23c78b52'/%3E%3C/svg%3E"
     />
     <link rel="stylesheet" href="./site.css" />
+    <script src="./runtime-config.js"></script>
     <script src="./site.js" defer></script>
   </head>
   <body class="home-page">
@@ -46,7 +47,7 @@
           <a href="#model">Fund model</a>
           <a href="#governance">Governance</a>
           <a href="#reporting">Reporting</a>
-          <a class="nav-cta" href="./pledge/">Prepare a pledge</a>
+          <a class="nav-cta" href="./pledge/" data-live-intake>Prepare a pledge</a>
         </nav>
       </div>
     </header>
@@ -62,7 +63,7 @@
               healthcare for Igbajo and more than 30 surrounding communities.
             </p>
             <div class="hero-actions">
-              <a class="button button-primary" href="./pledge/">
+              <a class="button button-primary" href="./pledge/" data-live-intake>
                 Prepare a pledge
                 <span aria-hidden="true">↗</span>
               </a>
@@ -202,7 +203,7 @@
             <span class="card-code">A</span>
             <h3>Cash gifts</h3>
             <p>One-time or scheduled pledges in NGN or USD, subject to approved payment and banking channels.</p>
-            <a href="./pledge/">Prepare a cash pledge <span aria-hidden="true">→</span></a>
+            <a href="./pledge/" data-live-intake>Prepare a cash pledge <span aria-hidden="true">→</span></a>
           </article>
           <article class="contribution-card">
             <span class="card-code">B</span>
@@ -324,7 +325,7 @@
               <span>One-time or recurring</span>
               <span>Cash & non-cash</span>
             </div>
-            <a class="button button-primary pledge-direct-action" href="./pledge/">
+            <a class="button button-primary pledge-direct-action" href="./pledge/" data-live-intake>
               Open the pledge desk <span aria-hidden="true">→</span>
             </a>
           </div>
@@ -472,7 +473,7 @@
         <a href="#mandate">Mandate</a>
         <a href="#governance">Governance</a>
         <a href="#reporting">Reporting</a>
-        <a href="./pledge/">Pledge desk</a>
+        <a href="./pledge/" data-live-intake>Pledge desk</a>
       </div>
       <p class="footer-legal">
         This is a private pre-launch website. Payment instructions, trustees’ contact details and formal policies must
@@ -498,12 +499,13 @@
       <p class="dialog-reference">Reference <strong data-pledge-reference></strong></p>
       <div class="dialog-actions">
         <button class="button button-primary" type="button" data-copy-pledge>Copy summary</button>
+        <a class="button button-dark" href="#" data-live-intake data-live-only hidden>Continue to secure form</a>
         <button class="text-button" type="button" data-dialog-close>Return to site</button>
       </div>
       <p class="copy-status" role="status" aria-live="polite" data-copy-status></p>
     </dialog>
 
-    <a class="mobile-pledge-bar" href="./pledge/" data-floating-cta>
+    <a class="mobile-pledge-bar" href="./pledge/" data-floating-cta data-live-intake>
       <span>Prepare a pledge</span><span aria-hidden="true">→</span>
     </a>
   </body>

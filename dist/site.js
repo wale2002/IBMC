@@ -14,6 +14,39 @@ const stepTitle = document.querySelector("[data-step-title]");
 const floatingCta = document.querySelector("[data-floating-cta]");
 let lastSummaryText = "";
 
+const getLiveIntakeUrl = () => {
+  const configured = String(window.IBMC_CONFIG?.appsScriptWebAppUrl || "").trim();
+  if (!configured) return "";
+  try {
+    const url = new URL(configured);
+    const validHost = url.protocol === "https:" && url.host === "script.google.com" && !url.username && !url.password;
+    const validPath = /^\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(url.pathname);
+    return validHost && validPath ? url.href : "";
+  } catch {
+    return "";
+  }
+};
+
+const liveIntakeUrl = getLiveIntakeUrl();
+if (liveIntakeUrl) {
+  document.querySelectorAll("[data-live-intake]").forEach((link) => {
+    link.href = liveIntakeUrl;
+    link.target = "_blank";
+    link.rel = "noopener";
+  });
+  document.querySelectorAll("[data-live-only]").forEach((element) => {
+    element.hidden = false;
+  });
+  const intakeBadge = document.querySelector("[data-intake-badge]");
+  if (intakeBadge) intakeBadge.textContent = "Live intake";
+  const intakeTitle = document.querySelector("[data-intake-status-title]");
+  if (intakeTitle) intakeTitle.textContent = "The secure contribution form is available.";
+  const intakeCopy = document.querySelector("[data-intake-status-copy]");
+  if (intakeCopy) {
+    intakeCopy.textContent = "Open the official form to submit a donation, scheduled pledge, asset, or service offer.";
+  }
+}
+
 const updateHeader = () => {
   const requiresSolidHeader = document.body.classList.contains("pledge-page-body");
   header?.classList.toggle("scrolled", requiresSolidHeader || window.scrollY > 24);

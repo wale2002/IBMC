@@ -30,10 +30,8 @@ function setupSystem() {
   CacheService.getScriptCache().removeAll(DEFAULT_SETTINGS.map(row => `setting:${row[0]}`));
   SpreadsheetApp.flush();
 
-  SpreadsheetApp.getUi().alert(
-    'IBMC Endowment setup complete',
-    'Review the Settings sheet, configure Script Properties, then install automation and deploy the web app.',
-    SpreadsheetApp.getUi().ButtonSet.OK
+  console.log(
+    'IBMC Endowment setup complete. Review the Settings sheet, configure Script Properties, then install automation and deploy the web app.'
   );
 }
 
@@ -144,10 +142,10 @@ function installAutomation() {
 
 function installReminderAutomation() {
   assertTrustee_();
-  removeTriggerHandlers_(['runDailyReminders', 'reconcilePendingPayments']);
-  ScriptApp.newTrigger('runDailyReminders').timeBased().everyDays(1).atHour(8).create();
-  SpreadsheetApp.getUi().alert('Daily reminders installed for 08:00 Africa/Lagos. Paystack reconciliation remains disabled.');
-  return { reminders: true, paystackReconciliation: false };
+  removeTriggerHandlers_(['runDailyReminders', 'runScheduledReminders_']);
+  ScriptApp.newTrigger('runScheduledReminders_').timeBased().everyDays(1).atHour(8).create();
+  console.log('Daily reminders installed for 08:00 Africa/Lagos. Existing Paystack reconciliation settings were left unchanged.');
+  return { reminders: true, paystackReconciliation: 'unchanged' };
 }
 
 function installPaystackReconciliation() {
@@ -160,7 +158,7 @@ function installPaystackReconciliation() {
   }
   removeTriggerHandlers_(['reconcilePendingPayments']);
   ScriptApp.newTrigger('reconcilePendingPayments').timeBased().everyHours(6).create();
-  SpreadsheetApp.getUi().alert('Paystack reconciliation installed for every six hours.');
+  console.log('Paystack reconciliation installed for every six hours.');
   return { paystackReconciliation: true };
 }
 

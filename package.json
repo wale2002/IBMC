@@ -1,0 +1,10 @@
+{
+  "name": "ibmc-endowment",
+  "version": "1.0.1",
+  "private": true,
+  "description": "IBMC Endowment Fund website and Apps Script workflow",
+  "scripts": {
+    "test": "node --test backend/apps-script/tests/*.test.js"
+  },
+  "engines": { "node": ">=20" }
+}

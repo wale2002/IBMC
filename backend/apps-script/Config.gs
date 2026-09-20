@@ -101,7 +101,7 @@ const DEFAULT_SETTINGS = Object.freeze([
   ['PRIVACY_NOTICE_URL', '', 'Published privacy notice'],
   ['DONOR_PAGE_INTRO', 'Support long-term healthcare for Igbajo and surrounding communities.', 'Public form introduction'],
   ['RECEIPT_PREFIX', 'IBMC', 'Prefix used for receipt numbers'],
-  ['AUTOMATIC_EMAILS', 'TRUE', 'TRUE enables acknowledgements and reminders'],
+  ['AUTOMATIC_EMAILS', 'FALSE', 'TRUE enables acknowledgements and reminders'],
   ['PAYSTACK_ENABLED', 'FALSE', 'TRUE enables online payments after credentials are configured']
 ]);
 
