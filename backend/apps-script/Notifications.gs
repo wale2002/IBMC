@@ -70,9 +70,10 @@ function notifyTrusteesOfSubmission_(result, donor) {
     `Email: ${donor.email || 'Not provided'}`,
     `Phone: ${donor.phone || 'Not provided'}`,
     `Status: ${result.message}`,
+    result.evidenceUrl ? `Private evidence: ${result.evidenceUrl}` : '',
     '',
     'Open the private trustee Google Sheet to review the record and audit history.'
-  ].join('\n');
+  ].filter((line, index, lines) => line || index === 1 || lines[index - 1]).join('\n');
 
   const summary = { sent: 0, failed: 0 };
   recipients.forEach(recipient => {

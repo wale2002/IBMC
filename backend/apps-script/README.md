@@ -2,7 +2,7 @@
 
 This package implements the immediate pilot requested in the client documents. Donors can register, make an immediate cash donation, make a scheduled cash pledge, offer an asset, or offer time and expertise. Trustees operate the system from a private Google Sheet. Google Apps Script handles validation, acknowledgements, reminders, Paystack payment initiation and verification, pledge balances, receipts, audit records, and a currency-separated dashboard.
 
-The public intake uses an Apps Script web page instead of Google Forms. This keeps the form open to donors who do not have Google accounts and avoids the sign-in requirement attached to Google Forms file uploads. Supporting evidence is collected as a link or handled directly by a trustee.
+The public intake uses an Apps Script web page instead of Google Forms. This keeps the form open to donors who do not have Google accounts. Donation receipts and asset photos can be uploaded directly; the script optimises them, stores them privately in Google Drive, and writes trustee-only links into the register. Supporting document links remain available.
 
 ## Files
 
@@ -41,6 +41,7 @@ The public intake uses an Apps Script web page instead of Google Forms. This kee
    - `TRUSTEE_EMAILS`: comma-separated authorised trustee emails
    - `PAYSTACK_SECRET_KEY`: begin with a Paystack test secret key; never place this value in a sheet or HTML file
    - `WEB_APP_URL`: add this after the first web-app deployment
+   - `UPLOAD_FOLDER_ID`: written automatically when the first image is uploaded; it may instead point to a dedicated private folder owned by the deployment account
 
 8. Deploy as a web app:
 
@@ -52,7 +53,7 @@ The public intake uses an Apps Script web page instead of Google Forms. This kee
 11. Share the Google Sheet only with approved trustees and finance staff. Donors receive only the web-app URL.
 12. Set the tested `/exec` deployment URL in `dist/runtime-config.js` and publish the website update. Vercel does not deploy the Apps Script code. New Apps Script versions must be deployed separately.
 
-For an existing project, update the script files and manifest, authorise the added `userinfo.email` scope for trustee identity checks, and create a new deployment version. Existing sheet records and settings are preserved. New workbooks default `AUTOMATIC_EMAILS` to `FALSE`; enable it explicitly when ready. If using clasp, copy `.clasp.json.example` to `.clasp.json` and supply the existing project ID. Inspect the upload list before pushing; keep credentials outside the repository.
+For an existing project, update the script files and manifest, authorise the `userinfo.email` and Google Drive scopes, and create a new deployment version. Existing sheet records and settings are preserved. Uploaded images remain private to the deployment account and explicitly shared Drive users. New workbooks default `AUTOMATIC_EMAILS` to `FALSE`; enable it explicitly when ready. If using clasp, copy `.clasp.json.example` to `.clasp.json` and supply the existing project ID. Inspect the upload list before pushing; keep credentials outside the repository.
 
 ## Paystack activation
 
@@ -72,6 +73,7 @@ The Apps Script web-app request object does not provide the Paystack signature h
 ## Trustee workflow
 
 - **Manual cash or bank transfer:** select its row in `Contributions`, verify evidence against the bank record, then use **IBMC Endowment > Confirm selected manual receipt**.
+- **Uploaded evidence:** open the private Drive link from `Evidence URL`. Treat the image as supporting evidence and reconcile it against the bank or gateway record before confirming a receipt.
 - **Paystack payment:** callbacks and scheduled reconciliation verify payments. A trustee can also select a row and choose **Verify selected Paystack payment**.
 - **Asset:** complete valuation, ownership, conflict, and gift-acceptance checks before selecting the asset row and choosing **Approve selected asset**. `Accepted` still does not mean title has transferred; use `Transfer In Progress` and `Transferred` for that lifecycle.
 - **Service:** confirm that the offer matches an approved need before accepting and scheduling it.
