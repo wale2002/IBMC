@@ -16,7 +16,8 @@ const functionNames = new Set(Array.from(scripts.matchAll(/function\s+([A-Za-z0-
   'installReminderAutomation', 'installPaystackReconciliation',
   'runDailyReminders', 'reconcilePendingPayments', 'verifySelectedPayment',
   'confirmSelectedManualReceipt', 'approveSelectedAsset', 'acceptSelectedService',
-  'notifyTrusteesOfSubmission_'
+  'notifyTrusteesOfSubmission_', 'normalizeSubmissionImages_',
+  'storeSubmissionImages_'
 ].forEach(name => assert(functionNames.has(name), `Missing Apps Script entry point: ${name}`));
 
 const ids = new Set(Array.from(html.matchAll(/\sid="([^"]+)"/g), match => match[1]));
@@ -26,6 +27,7 @@ Array.from(html.matchAll(/byId\('([^']+)'\)/g), match => match[1])
 assert(!/sk_(?:test|live)_[A-Za-z0-9]+/.test(scripts + html), 'A Paystack secret appears to be embedded in source');
 assert(/function reconcilePendingPayments\(\)[\s\S]*PAYSTACK_ENABLED/.test(scripts), 'Paystack reconciliation is not guarded by PAYSTACK_ENABLED');
 assert(manifest.oauthScopes.includes('https://www.googleapis.com/auth/spreadsheets'));
+assert(manifest.oauthScopes.includes('https://www.googleapis.com/auth/drive'));
 assert(manifest.oauthScopes.includes('https://www.googleapis.com/auth/script.external_request'));
 assert(manifest.oauthScopes.includes('https://www.googleapis.com/auth/script.send_mail'));
 assert.equal(manifest.timeZone, 'Africa/Lagos');
