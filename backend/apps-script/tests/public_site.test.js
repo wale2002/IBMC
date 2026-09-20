@@ -17,7 +17,12 @@ assert(home.includes('data-live-intake'));
 assert(pledge.includes('data-live-only'));
 assert(siteScript.includes('appsScriptWebAppUrl'));
 assert(siteScript.includes('script.google.com'));
-assert(!/https:\/\/script\.google\.com\/macros\/s\/[^"']+\/exec/.test(runtimeConfig));
+const configuredUrl = runtimeConfig.match(/appsScriptWebAppUrl:\s*"([^"]+)"/);
+assert(configuredUrl);
+assert.match(
+  configuredUrl[1],
+  /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/
+);
 
 function boot(configuredUrl) {
   const element = (value = '') => ({
