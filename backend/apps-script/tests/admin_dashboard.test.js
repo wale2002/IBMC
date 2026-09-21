@@ -19,9 +19,14 @@ assert.match(adminServer, /function adminApproveAsset[\s\S]*dueDiligenceConfirme
 assert.match(adminServer, /function adminAcceptService[\s\S]*needConfirmed !== true/);
 assert.match(code, /view === 'admin'/);
 assert.match(code, /createTemplateFromFile\('Admin'\)/);
-assert(adminHtml.includes('Trustee dashboard'));
+assert(adminHtml.includes('Endowment office'));
 assert(adminHtml.includes('I matched this payment against the bank record.'));
 assert(adminHtml.includes('google.script.run'));
+assert.match(adminHtml, /@media\(max-width:820px\)[\s\S]*table,tbody,tr,td \{ display:block/);
+assert.match(adminHtml, /td::before \{ content:attr\(data-label\)/);
+assert.match(adminHtml, /data-label="Reference"/);
+assert.match(adminHtml, /function friendlyAuditSummary\(item\)/);
+assert.doesNotMatch(adminHtml, /grid-template-columns:150px 105px 1fr/);
 const clientScript = adminHtml.match(/<script>([\s\S]*?)<\/script>/);
 assert(clientScript, 'Admin client script was not found');
 new vm.Script(clientScript[1], { filename: 'Admin.client.js' });
