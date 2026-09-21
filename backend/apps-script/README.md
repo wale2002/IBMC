@@ -4,6 +4,8 @@ This package implements the immediate pilot requested in the client documents. D
 
 The public intake uses an Apps Script web page instead of Google Forms. This keeps the form open to donors who do not have Google accounts. Donation receipts and asset photos can be uploaded directly; the script optimises them, stores them privately in Google Drive, and writes trustee-only links into the register. Supporting document links remain available.
 
+The trustee dashboard is a separate Apps Script web deployment opened from `/admin/` on the Vercel site. Deploy it as **user accessing the web app**, require Google sign-in, and keep `TRUSTEE_EMAILS` as the server-side allowlist. The public donor deployment remains separate and anonymous.
+
 ## Files
 
 - `Config.gs` defines sheets, columns, status values, and defaults.
@@ -52,6 +54,7 @@ The public intake uses an Apps Script web page instead of Google Forms. This kee
 10. When ready, run `installReminderAutomation`. It creates the private `runScheduledReminders_` daily trigger for the 08:00 hour. It replaces any older reminder trigger and preserves existing Paystack reconciliation triggers. The installing account must be an authorised trustee.
 11. Share the Google Sheet only with approved trustees and finance staff. Donors receive only the web-app URL.
 12. Set the tested `/exec` deployment URL in `dist/runtime-config.js` and publish the website update. Vercel does not deploy the Apps Script code. New Apps Script versions must be deployed separately.
+13. Create a second web-app deployment for the trustee dashboard, set it to execute as the accessing user, require Google sign-in, and add its `/exec?view=admin` URL as `appsScriptAdminUrl` in `dist/runtime-config.js`.
 
 For an existing project, update the script files and manifest, authorise the `userinfo.email` and Google Drive scopes, and create a new deployment version. Existing sheet records and settings are preserved. Uploaded images remain private to the deployment account and explicitly shared Drive users. New workbooks default `AUTOMATIC_EMAILS` to `FALSE`; enable it explicitly when ready. If using clasp, copy `.clasp.json.example` to `.clasp.json` and supply the existing project ID. Inspect the upload list before pushing; keep credentials outside the repository.
 

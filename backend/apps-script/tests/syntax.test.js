@@ -7,7 +7,7 @@ const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const order = [
   'Config.gs', 'Domain.gs', 'Repository.gs', 'Ledger.gs',
-  'Notifications.gs', 'PaymentGateway.gs', 'Setup.gs', 'Code.gs'
+  'Notifications.gs', 'PaymentGateway.gs', 'Setup.gs', 'Admin.gs', 'Code.gs'
 ];
 const combined = order.map(name => `\n/* ${name} */\n${fs.readFileSync(path.join(root, name), 'utf8')}`).join('\n');
 new vm.Script(combined, { filename: 'IBMC_Endowment_MVP.gs' });

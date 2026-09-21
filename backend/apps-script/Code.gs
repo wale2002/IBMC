@@ -3,6 +3,15 @@
  */
 
 function doGet(e) {
+  const view = e && e.parameter ? sanitizeText_(e.parameter.view, 40).toLowerCase() : '';
+  if (view === 'admin') {
+    const template = HtmlService.createTemplateFromFile('Admin');
+    template.organisationName = getSetting_('ORGANISATION_NAME', 'Igbajo Baptist Medical Centre');
+    return template.evaluate()
+      .setTitle(`${template.organisationName} Trustee Dashboard`)
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+  }
+
   const reference = e && e.parameter ? sanitizeText_(e.parameter.reference, 100) : '';
   if (reference) {
     const template = HtmlService.createTemplateFromFile('Callback');

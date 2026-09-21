@@ -5,7 +5,7 @@
 
 const APP = Object.freeze({
   name: 'IBMC Endowment Fund',
-  version: '1.1.0',
+  version: '1.2.0',
   timeZone: 'Africa/Lagos',
   dateFormat: 'yyyy-MM-dd',
   dateTimeFormat: 'yyyy-MM-dd HH:mm:ss',

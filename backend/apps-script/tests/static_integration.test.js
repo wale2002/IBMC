@@ -17,7 +17,8 @@ const functionNames = new Set(Array.from(scripts.matchAll(/function\s+([A-Za-z0-
   'runDailyReminders', 'reconcilePendingPayments', 'verifySelectedPayment',
   'confirmSelectedManualReceipt', 'approveSelectedAsset', 'acceptSelectedService',
   'notifyTrusteesOfSubmission_', 'normalizeSubmissionImages_',
-  'storeSubmissionImages_'
+  'storeSubmissionImages_', 'getAdminDashboardData',
+  'adminConfirmContribution', 'adminApproveAsset', 'adminAcceptService'
 ].forEach(name => assert(functionNames.has(name), `Missing Apps Script entry point: ${name}`));
 
 const ids = new Set(Array.from(html.matchAll(/\sid="([^"]+)"/g), match => match[1]));
