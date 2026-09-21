@@ -8,6 +8,7 @@ const vm = require('node:vm');
 const repoRoot = path.resolve(__dirname, '..', '..', '..');
 const home = fs.readFileSync(path.join(repoRoot, 'dist', 'index.html'), 'utf8');
 const pledge = fs.readFileSync(path.join(repoRoot, 'dist', 'pledge', 'index.html'), 'utf8');
+const admin = fs.readFileSync(path.join(repoRoot, 'dist', 'admin', 'index.html'), 'utf8');
 const siteScript = fs.readFileSync(path.join(repoRoot, 'dist', 'site.js'), 'utf8');
 const runtimeConfig = fs.readFileSync(path.join(repoRoot, 'dist', 'runtime-config.js'), 'utf8');
 
@@ -15,6 +16,10 @@ assert(home.indexOf('runtime-config.js') < home.indexOf('site.js'));
 assert(pledge.indexOf('runtime-config.js') < pledge.indexOf('site.js'));
 assert(home.includes('data-live-intake'));
 assert(pledge.includes('data-live-only'));
+assert(home.includes('./admin/'));
+assert(pledge.includes('../admin/'));
+assert(admin.includes('appsScriptAdminUrl'));
+assert(admin.includes('Continue with Google'));
 assert(siteScript.includes('appsScriptWebAppUrl'));
 assert(siteScript.includes('script.google.com'));
 const configuredUrl = runtimeConfig.match(/appsScriptWebAppUrl:\s*"([^"]+)"/);
@@ -23,6 +28,7 @@ assert.match(
   configuredUrl[1],
   /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/
 );
+assert.match(runtimeConfig, /appsScriptAdminUrl:\s*"[^"]*"/);
 
 function boot(configuredUrl) {
   const element = (value = '') => ({
