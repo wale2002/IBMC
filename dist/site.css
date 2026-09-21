@@ -613,29 +613,35 @@ img {
 .contribution-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  gap: 0.9rem;
   width: min(100%, var(--max-width));
   margin: clamp(3rem, 6vw, 5rem) auto 0;
-  border-top: 1px solid var(--line);
-  border-left: 1px solid var(--line);
 }
 
 .contribution-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  min-height: 25rem;
-  padding: 1.4rem;
+  min-height: 23rem;
+  overflow: hidden;
+  padding: 1.65rem;
   background: var(--paper);
-  border-right: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  border: 1px solid var(--line);
+  box-shadow: 0 14px 34px rgba(7, 27, 45, 0.05);
   transition:
     color 200ms ease,
-    background-color 200ms ease;
+    background-color 200ms ease,
+    transform 200ms ease,
+    box-shadow 200ms ease;
 }
 
-.contribution-card:hover {
+.contribution-card:hover,
+.contribution-card:focus-within {
   color: var(--white);
   background: var(--ink-2);
+  border-color: var(--ink-2);
+  box-shadow: 0 22px 42px rgba(7, 27, 45, 0.16);
+  transform: translateY(-0.35rem);
 }
 
 .contribution-card.featured {
@@ -650,6 +656,31 @@ img {
   letter-spacing: 0.15em;
 }
 
+.card-topline {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-tag {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.28rem 0.55rem;
+  color: var(--muted);
+  font-size: 0.59rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.contribution-card.featured .card-tag,
+.contribution-card:hover .card-tag,
+.contribution-card:focus-within .card-tag {
+  color: rgba(255, 255, 255, 0.75);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
 .contribution-card h3 {
   margin: auto 0 1.2rem;
   font-family: var(--serif);
@@ -659,22 +690,30 @@ img {
 }
 
 .contribution-card p {
-  min-height: 8rem;
+  min-height: 7.2rem;
   margin: 0;
   color: var(--muted);
   font-size: 0.92rem;
 }
 
 .contribution-card:hover p,
+.contribution-card:focus-within p,
 .contribution-card.featured p {
   color: rgba(255, 255, 255, 0.64);
 }
 
 .contribution-card a {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
   margin-top: 1.2rem;
+  border-top: 1px solid currentColor;
+  padding-top: 1rem;
   color: var(--copper);
   font-size: 0.85rem;
   font-weight: 700;
+  text-decoration: none;
   text-underline-offset: 0.3rem;
 }
 
@@ -965,7 +1004,7 @@ fieldset legend {
   opacity: 0;
 }
 
-.option-grid span {
+.option-grid > label > span {
   display: grid;
   min-height: 3.7rem;
   padding: 0.7rem;
@@ -1470,6 +1509,116 @@ fieldset legend {
   line-height: 1.55;
 }
 
+.choice-intro {
+  max-width: 38rem;
+  margin: -0.4rem 0 1.25rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.contribution-options {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.contribution-options .choice-card {
+  display: grid;
+  grid-template-columns: 2.6rem minmax(0, 1fr) 1.35rem;
+  gap: 0.8rem;
+  align-items: center;
+  min-height: 6.35rem;
+  padding: 0.9rem;
+  place-items: initial;
+  color: var(--ink);
+  background: #fbfbfa;
+  border: 1px solid var(--line);
+  text-align: left;
+  box-shadow: 0 6px 18px rgba(7, 27, 45, 0.035);
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.contribution-options .choice-icon {
+  display: grid;
+  width: 2.6rem;
+  min-height: 2.6rem;
+  padding: 0;
+  place-items: center;
+  color: var(--copper-deep);
+  background: #f2e8dd;
+  border: 0;
+  font-family: var(--serif);
+  font-size: 1.15rem;
+}
+
+.contribution-options .choice-copy {
+  display: grid;
+  min-height: 0;
+  gap: 0.25rem;
+  padding: 0;
+  place-items: initial;
+  border: 0;
+  text-align: left;
+}
+
+.choice-copy strong {
+  font-size: 0.82rem;
+  line-height: 1.25;
+}
+
+.choice-copy small {
+  color: var(--muted);
+  font-size: 0.69rem;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.contribution-options .choice-check {
+  display: grid;
+  width: 1.3rem;
+  min-height: 1.3rem;
+  padding: 0;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: transparent;
+  background: transparent;
+  font-size: 0.7rem;
+}
+
+.contribution-options .contribution-choice:hover .choice-card {
+  border-color: #aebbc0;
+  box-shadow: 0 10px 24px rgba(7, 27, 45, 0.08);
+  transform: translateY(-2px);
+}
+
+.contribution-options input:checked + .choice-card {
+  color: var(--white);
+  background: var(--ink);
+  border-color: var(--ink);
+  box-shadow: 0 12px 26px rgba(7, 27, 45, 0.17);
+}
+
+.contribution-options input:checked + .choice-card .choice-icon {
+  color: var(--ink);
+  background: var(--copper);
+}
+
+.contribution-options input:checked + .choice-card .choice-copy small {
+  color: rgba(255, 255, 255, 0.67);
+}
+
+.contribution-options input:checked + .choice-card .choice-check {
+  color: var(--ink);
+  background: var(--copper);
+  border-color: var(--copper);
+}
+
 .intake-status-action {
   display: inline-flex;
   margin-top: 1rem;
@@ -1938,6 +2087,14 @@ fieldset legend {
 
   .option-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .contribution-options {
+    grid-template-columns: 1fr;
+  }
+
+  .contribution-options .choice-card {
+    min-height: 5.6rem;
   }
 
   .segmented-control {
