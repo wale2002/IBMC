@@ -83,14 +83,33 @@
 
             <div class="form-step-panel active" data-step-panel="1">
               <fieldset>
-                <legend>What would you like to contribute?</legend>
+                <legend>Choose how you would like to contribute</legend>
+                <p class="choice-intro">Select the option that best describes your support. You can change it before continuing.</p>
                 <div class="option-grid contribution-options">
-                  <label><input type="radio" name="contributionType" value="Cash gift" checked /><span>Cash gift</span></label>
-                  <label><input type="radio" name="contributionType" value="Equipment" /><span>Equipment</span></label>
-                  <label><input type="radio" name="contributionType" value="Property" /><span>Property</span></label>
-                  <label><input type="radio" name="contributionType" value="Shares or securities" /><span>Shares / securities</span></label>
-                  <label><input type="radio" name="contributionType" value="Professional service" /><span>Professional service</span></label>
-                  <label><input type="radio" name="contributionType" value="Volunteer time" /><span>Volunteer time</span></label>
+                  <label class="contribution-choice">
+                    <input type="radio" name="contributionType" value="Cash gift" checked />
+                    <span class="choice-card"><span class="choice-icon" aria-hidden="true">₦</span><span class="choice-copy"><strong>Cash gift</strong><small>Give once or set a regular pledge</small></span><span class="choice-check" aria-hidden="true">✓</span></span>
+                  </label>
+                  <label class="contribution-choice">
+                    <input type="radio" name="contributionType" value="Equipment" />
+                    <span class="choice-card"><span class="choice-icon" aria-hidden="true">＋</span><span class="choice-copy"><strong>Medical equipment</strong><small>Offer clinical or hospital equipment</small></span><span class="choice-check" aria-hidden="true">✓</span></span>
+                  </label>
+                  <label class="contribution-choice">
+                    <input type="radio" name="contributionType" value="Property" />
+                    <span class="choice-card"><span class="choice-icon" aria-hidden="true">⌂</span><span class="choice-copy"><strong>Property</strong><small>Offer land, buildings or other assets</small></span><span class="choice-check" aria-hidden="true">✓</span></span>
+                  </label>
+                  <label class="contribution-choice">
+                    <input type="radio" name="contributionType" value="Shares or securities" />
+                    <span class="choice-card"><span class="choice-icon" aria-hidden="true">↗</span><span class="choice-copy"><strong>Shares or securities</strong><small>Transfer an eligible financial asset</small></span><span class="choice-check" aria-hidden="true">✓</span></span>
+                  </label>
+                  <label class="contribution-choice">
+                    <input type="radio" name="contributionType" value="Professional service" />
+                    <span class="choice-card"><span class="choice-icon" aria-hidden="true">★</span><span class="choice-copy"><strong>Professional service</strong><small>Contribute specialist knowledge or skills</small></span><span class="choice-check" aria-hidden="true">✓</span></span>
+                  </label>
+                  <label class="contribution-choice">
+                    <input type="radio" name="contributionType" value="Volunteer time" />
+                    <span class="choice-card"><span class="choice-icon" aria-hidden="true">◎</span><span class="choice-copy"><strong>Volunteer time</strong><small>Support an approved operational need</small></span><span class="choice-check" aria-hidden="true">✓</span></span>
+                  </label>
                 </div>
               </fieldset>
 

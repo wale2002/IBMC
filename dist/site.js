@@ -98,6 +98,23 @@ const selectedValue = (name) =>
   form.querySelector(`[name="${name}"]`)?.value ||
   "";
 
+const contributionPathMap = {
+  cash: "Cash gift",
+  equipment: "Equipment",
+  property: "Property",
+  shares: "Shares or securities",
+  service: "Professional service",
+  volunteer: "Volunteer time",
+};
+const requestedContributionPath = new URLSearchParams(window.location.search).get("type");
+const requestedContributionValue = contributionPathMap[requestedContributionPath];
+if (requestedContributionValue) {
+  const requestedOption = [...form.querySelectorAll('input[name="contributionType"]')].find(
+    (input) => input.value === requestedContributionValue,
+  );
+  if (requestedOption) requestedOption.checked = true;
+}
+
 const updateContributionFields = () => {
   const isCash = selectedValue("contributionType") === "Cash gift";
   cashFields.hidden = !isCash;
