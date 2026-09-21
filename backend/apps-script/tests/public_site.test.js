@@ -16,6 +16,11 @@ assert(home.indexOf('runtime-config.js') < home.indexOf('site.js'));
 assert(pledge.indexOf('runtime-config.js') < pledge.indexOf('site.js'));
 assert(home.includes('data-live-intake'));
 assert(pledge.includes('data-live-only'));
+for (const path of ['cash', 'equipment', 'shares', 'service']) {
+  assert(home.includes(`./pledge/?type=${path}`));
+}
+assert.equal((pledge.match(/class="choice-card"/g) || []).length, 6);
+assert(siteScript.includes('contributionPathMap'));
 assert(home.includes('./admin/'));
 assert(pledge.includes('../admin/'));
 assert(admin.includes('appsScriptAdminUrl'));
@@ -60,8 +65,8 @@ function boot(configuredUrl) {
     }
   };
   vm.runInNewContext(siteScript, {
-    document, URL, Date, Intl,
-    window: { IBMC_CONFIG: { appsScriptWebAppUrl: configuredUrl }, scrollY: 0, addEventListener() {} }
+    document, URL, URLSearchParams, Date, Intl,
+    window: { IBMC_CONFIG: { appsScriptWebAppUrl: configuredUrl }, location: { search: '' }, scrollY: 0, addEventListener() {} }
   }, { filename: 'site.js' });
   return { link, liveOnly, elements };
 }
