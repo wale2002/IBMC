@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071b2d">
+  <title>Trustee Dashboard</title>
+  <style>
+    :root { --ink:#071b2d; --ink2:#12324b; --paper:#f5f6f4; --white:#fff; --line:#dfe5e8; --muted:#64717b; --copper:#c78b52; --green:#1f7a54; --amber:#9a6718; --red:#a53b36; --shadow:0 18px 50px rgba(7,27,45,.09); font-family:"Segoe UI",Arial,sans-serif; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:var(--paper); }
+    button,input,textarea { font:inherit; }
+    button,a { -webkit-tap-highlight-color:transparent; }
+    a { color:inherit; }
+    .topbar { height:6px; background:var(--copper); }
+    .shell { min-height:100vh; display:grid; grid-template-columns:260px minmax(0,1fr); }
+    aside { position:sticky; top:0; height:100vh; padding:28px 22px; color:#fff; background:var(--ink); }
+    .brand { display:flex; gap:12px; align-items:center; margin-bottom:38px; }
+    .brand-mark { display:grid; width:42px; height:42px; place-items:center; border:1px solid rgba(255,255,255,.65); color:var(--copper); font:26px Georgia,serif; }
+    .brand strong,.brand span { display:block; }
+    .brand strong { font-size:.82rem; }
+    .brand span { color:var(--copper); font-size:.7rem; letter-spacing:.13em; text-transform:uppercase; }
+    nav { display:grid; gap:7px; }
+    .nav-button { width:100%; border:0; border-radius:9px; padding:12px 14px; color:rgba(255,255,255,.72); background:transparent; text-align:left; cursor:pointer; }
+    .nav-button:hover,.nav-button.active { color:#fff; background:rgba(255,255,255,.1); }
+    .aside-foot { position:absolute; right:22px; bottom:25px; left:22px; color:rgba(255,255,255,.62); font-size:.78rem; line-height:1.5; }
+    main { min-width:0; padding:34px clamp(20px,4vw,54px) 70px; }
+    .page-head { display:flex; gap:20px; align-items:flex-start; justify-content:space-between; margin-bottom:30px; }
+    .eyebrow { margin:0 0 7px; color:var(--copper); font-size:.72rem; font-weight:800; letter-spacing:.15em; text-transform:uppercase; }
+    h1 { margin:0; font:400 clamp(2rem,4vw,3.2rem)/1 Georgia,serif; letter-spacing:-.035em; }
+    .head-meta { margin:9px 0 0; color:var(--muted); font-size:.86rem; }
+    .head-actions { display:flex; flex-wrap:wrap; gap:9px; justify-content:flex-end; }
+    .button { display:inline-flex; min-height:42px; align-items:center; justify-content:center; border:1px solid var(--line); border-radius:8px; padding:9px 14px; color:var(--ink); background:#fff; font-weight:750; text-decoration:none; cursor:pointer; }
+    .button-primary { border-color:var(--ink); color:#fff; background:var(--ink); }
+    .button:disabled { opacity:.55; cursor:wait; }
+    .notice { display:none; margin:0 0 20px; border-radius:9px; padding:13px 15px; background:#e8f3ed; color:#19583d; }
+    .notice.error { background:#fae9e8; color:#7d2b28; }
+    .notice.show { display:block; }
+    .loading { display:grid; min-height:55vh; place-items:center; text-align:center; }
+    .loading[hidden] { display:none; }
+    .spinner { width:44px; height:44px; margin:0 auto 15px; border:4px solid var(--line); border-top-color:var(--copper); border-radius:50%; animation:spin .8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .panel[hidden] { display:none; }
+    .metrics { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; margin-bottom:28px; }
+    .metric { min-width:0; border:1px solid var(--line); border-radius:12px; padding:18px; background:#fff; box-shadow:0 8px 28px rgba(7,27,45,.04); }
+    .metric span { display:block; min-height:2.6em; color:var(--muted); font-size:.76rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; }
+    .metric strong { display:block; overflow:hidden; font:400 1.8rem/1.15 Georgia,serif; text-overflow:ellipsis; white-space:nowrap; }
+    .metric small { color:var(--muted); }
+    .section-head { display:flex; gap:12px; align-items:end; justify-content:space-between; margin:0 0 14px; }
+    h2 { margin:0; font:400 1.6rem Georgia,serif; }
+    .section-head p { margin:0; color:var(--muted); font-size:.86rem; }
+    .table-card { overflow:hidden; border:1px solid var(--line); border-radius:12px; background:#fff; box-shadow:var(--shadow); }
+    .table-scroll { overflow:auto; }
+    table { width:100%; border-collapse:collapse; font-size:.86rem; }
+    th { padding:12px 14px; color:var(--muted); background:#f4f6f6; font-size:.7rem; letter-spacing:.07em; text-align:left; text-transform:uppercase; white-space:nowrap; }
+    td { padding:14px; border-top:1px solid var(--line); vertical-align:top; }
+    td strong,td small { display:block; }
+    td small { margin-top:3px; color:var(--muted); }
+    .status { display:inline-flex; border-radius:999px; padding:4px 9px; background:#edf1f2; font-size:.73rem; font-weight:800; white-space:nowrap; }
+    .status.pending { color:#79520f; background:#fff3d8; }
+    .status.received,.status.accepted { color:#176141; background:#e4f4eb; }
+    .evidence { display:flex; flex-wrap:wrap; gap:5px; }
+    .evidence a { color:#174f79; font-weight:750; }
+    .row-action { border:0; border-radius:7px; padding:8px 10px; color:#fff; background:var(--ink2); font-size:.78rem; font-weight:800; cursor:pointer; white-space:nowrap; }
+    .empty { padding:38px 18px; color:var(--muted); text-align:center; }
+    .activity { display:grid; gap:10px; }
+    .activity-item { display:grid; grid-template-columns:150px 105px 1fr; gap:14px; border:1px solid var(--line); border-radius:10px; padding:13px 15px; background:#fff; }
+    .activity-item time,.activity-item small { color:var(--muted); font-size:.78rem; }
+    dialog { width:min(520px,calc(100% - 28px)); border:0; border-radius:14px; padding:0; color:var(--ink); box-shadow:0 28px 90px rgba(0,0,0,.28); }
+    dialog::backdrop { background:rgba(7,27,45,.72); }
+    .dialog-body { padding:26px; }
+    .dialog-body h2 { margin-bottom:8px; }
+    .dialog-body p { margin:0 0 18px; color:var(--muted); }
+    .confirm-check { display:flex; gap:10px; align-items:flex-start; margin:18px 0; font-weight:650; }
+    .confirm-check input { width:18px; height:18px; margin-top:3px; }
+    textarea { width:100%; min-height:100px; border:1px solid #bcc7cc; border-radius:8px; padding:11px; resize:vertical; }
+    textarea:focus { outline:3px solid rgba(199,139,82,.22); border-color:var(--copper); }
+    .dialog-actions { display:flex; gap:9px; justify-content:flex-end; margin-top:18px; }
+    .dialog-error { min-height:1.3em; margin-top:10px; color:var(--red); font-size:.84rem; }
+    .mobile-tabs { display:none; }
+    @media(max-width:1050px) { .metrics { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+    @media(max-width:760px) {
+      .shell { display:block; }
+      aside { position:relative; height:auto; padding:18px 16px 12px; }
+      .brand { margin:0; }
+      aside nav,.aside-foot { display:none; }
+      main { padding:24px 14px 60px; }
+      .page-head { display:block; }
+      .head-actions { justify-content:flex-start; margin-top:16px; }
+      .mobile-tabs { display:flex; gap:7px; overflow-x:auto; margin:0 -14px 22px; padding:0 14px 7px; }
+      .mobile-tabs .nav-button { width:auto; flex:0 0 auto; color:var(--ink); background:#fff; border:1px solid var(--line); }
+      .mobile-tabs .nav-button.active { color:#fff; background:var(--ink); }
+      .metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .metric:last-child { grid-column:1/-1; }
+      .activity-item { grid-template-columns:1fr; gap:4px; }
+    }
+    @media(max-width:470px) { .metrics { grid-template-columns:1fr; } .metric:last-child { grid-column:auto; } .button { width:100%; } .head-actions { display:grid; } }
+  </style>
+</head>
+<body>
+  <div class="topbar"></div>
+  <div class="shell">
+    <aside>
+      <div class="brand"><span class="brand-mark">+</span><div><strong><?= organisationName ?></strong><span>Trustee dashboard</span></div></div>
+      <nav aria-label="Dashboard sections">
+        <button class="nav-button active" data-view="overview">Overview</button>
+        <button class="nav-button" data-view="contributions">Contributions</button>
+        <button class="nav-button" data-view="assets">Assets</button>
+        <button class="nav-button" data-view="services">Services</button>
+        <button class="nav-button" data-view="audit">Audit trail</button>
+      </nav>
+      <p class="aside-foot">Trustee access is checked against the approved email list for every request.</p>
+    </aside>
+    <main>
+      <header class="page-head">
+        <div><p class="eyebrow">Private administration</p><h1>Endowment overview</h1><p class="head-meta" id="headMeta">Checking trustee access…</p></div>
+        <div class="head-actions"><button class="button" id="refreshButton" type="button">Refresh</button><a class="button button-primary" id="sheetLink" href="#" target="_blank" rel="noopener" hidden>Open register</a></div>
+      </header>
+      <div class="mobile-tabs" aria-label="Dashboard sections">
+        <button class="nav-button active" data-view="overview">Overview</button><button class="nav-button" data-view="contributions">Contributions</button><button class="nav-button" data-view="assets">Assets</button><button class="nav-button" data-view="services">Services</button><button class="nav-button" data-view="audit">Audit</button>
+      </div>
+      <div class="notice" id="notice" role="status" aria-live="polite"></div>
+      <div class="loading" id="loading"><div><div class="spinner"></div><strong>Loading trustee records</strong><p>Google may ask you to sign in or approve access.</p></div></div>
+      <section class="panel" data-panel="overview" hidden><div class="metrics" id="metrics"></div><div class="section-head"><div><p class="eyebrow">Action queue</p><h2>Items needing attention</h2></div><p id="queueSummary"></p></div><div class="table-card"><div class="table-scroll"><table><thead><tr><th>Reference</th><th>Donor</th><th>Amount</th><th>Evidence</th><th>Status</th><th></th></tr></thead><tbody id="overviewRows"></tbody></table></div></div></section>
+      <section class="panel" data-panel="contributions" hidden><div class="section-head"><div><p class="eyebrow">Payment control</p><h2>Contributions</h2></div><p>Confirm only after matching the bank or gateway record.</p></div><div class="table-card"><div class="table-scroll"><table><thead><tr><th>Reference</th><th>Donor</th><th>Amount</th><th>Method</th><th>Evidence</th><th>Status</th><th></th></tr></thead><tbody id="contributionRows"></tbody></table></div></div></section>
+      <section class="panel" data-panel="assets" hidden><div class="section-head"><div><p class="eyebrow">Gift acceptance</p><h2>Assets</h2></div><p>Valuation and title checks remain required.</p></div><div class="table-card"><div class="table-scroll"><table><thead><tr><th>Reference</th><th>Donor</th><th>Asset</th><th>Estimate</th><th>Evidence</th><th>Status</th><th></th></tr></thead><tbody id="assetRows"></tbody></table></div></div></section>
+      <section class="panel" data-panel="services" hidden><div class="section-head"><div><p class="eyebrow">Time and expertise</p><h2>Service offers</h2></div><p>Accept offers that match an approved need.</p></div><div class="table-card"><div class="table-scroll"><table><thead><tr><th>Reference</th><th>Donor</th><th>Offer</th><th>Availability</th><th>Status</th><th></th></tr></thead><tbody id="serviceRows"></tbody></table></div></div></section>
+      <section class="panel" data-panel="audit" hidden><div class="section-head"><div><p class="eyebrow">Accountability</p><h2>Recent activity</h2></div><p>Latest 40 recorded events.</p></div><div class="activity" id="auditRows"></div></section>
+    </main>
+  </div>
+  <dialog id="actionDialog"><form method="dialog" class="dialog-body" id="actionForm"><p class="eyebrow">Trustee confirmation</p><h2 id="dialogTitle">Confirm action</h2><p id="dialogCopy"></p><label for="actionNote"><strong>Verification note</strong></label><textarea id="actionNote" maxlength="500" required placeholder="Enter the bank reference, due-diligence result, or assignment note."></textarea><label class="confirm-check"><input id="actionCheck" type="checkbox"><span id="checkLabel"></span></label><div class="dialog-error" id="dialogError" role="alert"></div><div class="dialog-actions"><button class="button" value="cancel">Cancel</button><button class="button button-primary" id="confirmAction" type="submit" value="default">Confirm</button></div></form></dialog>
+  <script>
+    const state = { data: null, view: 'overview', action: null };
+    const byId = id => document.getElementById(id);
+    const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+    const money = (currency, amount) => `${escapeHtml(currency)} ${Number(amount || 0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+    const statusClass = value => /received|accepted/i.test(value) ? 'accepted' : /pending|offered/i.test(value) ? 'pending' : '';
+    const donorCell = donor => `<strong>${escapeHtml(donor.name)}</strong><small>${escapeHtml(donor.email || donor.phone || donor.id)}</small>`;
+    const emptyRow = (columns, text) => `<tr><td class="empty" colspan="${columns}">${escapeHtml(text)}</td></tr>`;
+    function evidenceLinks(value) {
+      const urls = String(value || '').split(/[\n,]+/).map(item => item.trim()).filter(Boolean);
+      if (!urls.length) return '<small>No upload</small>';
+      return `<span class="evidence">${urls.map((url,index) => {
+        try { const parsed = new URL(url); if (parsed.protocol !== 'https:') return ''; return `<a href="${escapeHtml(parsed.href)}" target="_blank" rel="noopener">View ${urls.length > 1 ? index + 1 : 'receipt'}</a>`; } catch { return ''; }
+      }).join('')}</span>`;
+    }
+    function showNotice(message, error=false) { const node=byId('notice'); node.textContent=message; node.className=`notice show${error?' error':''}`; }
+    function clearNotice() { byId('notice').className='notice'; }
+    function setView(view) { state.view=view; document.querySelectorAll('[data-view]').forEach(button => button.classList.toggle('active',button.dataset.view===view)); document.querySelectorAll('[data-panel]').forEach(panel => panel.hidden=panel.dataset.panel!==view); }
+    document.querySelectorAll('[data-view]').forEach(button => button.addEventListener('click',()=>setView(button.dataset.view)));
+    function render(data) {
+      state.data=data; byId('loading').hidden=true; byId('headMeta').textContent=`Signed in as ${data.actor} · Updated ${data.updatedAt}`; byId('sheetLink').href=data.sheetUrl; byId('sheetLink').hidden=false;
+      const firstCurrency=Object.keys(data.totals)[0] || 'NGN'; const first=data.totals[firstCurrency] || {};
+      byId('metrics').innerHTML=[['Received',money(firstCurrency,first.received)],['Awaiting verification',data.counts.pendingContributions],['Pending assets',data.counts.pendingAssets],['Open services',data.counts.openServices],['Active donors',data.counts.activeDonors]].map(item=>`<article class="metric"><span>${escapeHtml(item[0])}</span><strong>${item[1]}</strong></article>`).join('');
+      const pending=data.contributions.filter(item=>item.status==='Pending Verification'); byId('queueSummary').textContent=`${pending.length} payment${pending.length===1?'':'s'} awaiting review`;
+      byId('overviewRows').innerHTML=pending.map(contributionRow).join('') || emptyRow(6,'No manual payments are awaiting verification.');
+      byId('contributionRows').innerHTML=data.contributions.map(item=>`<tr><td><strong>${escapeHtml(item.id)}</strong><small>${escapeHtml(item.createdAt)}</small></td><td>${donorCell(item.donor)}</td><td>${money(item.currency,item.amount)}</td><td>${escapeHtml(item.paymentMethod)}</td><td>${evidenceLinks(item.evidenceUrl)}</td><td><span class="status ${statusClass(item.status)}">${escapeHtml(item.status)}</span></td><td>${item.status==='Pending Verification'?actionButton('contribution',item.id,'Verify'):''}</td></tr>`).join('') || emptyRow(7,'No contribution records are available.');
+      byId('assetRows').innerHTML=data.assets.map(item=>`<tr><td><strong>${escapeHtml(item.id)}</strong><small>${escapeHtml(item.createdAt)}</small></td><td>${donorCell(item.donor)}</td><td><strong>${escapeHtml(item.type)}</strong><small>${escapeHtml(item.description)}</small></td><td>${item.estimatedValue?money(item.currency,item.estimatedValue):'Not supplied'}</td><td>${evidenceLinks(item.evidenceUrl)}</td><td><span class="status ${statusClass(item.status)}">${escapeHtml(item.status)}</span></td><td>${item.status==='Pending Review'?actionButton('asset',item.id,'Review'):''}</td></tr>`).join('') || emptyRow(7,'No assets require action.');
+      byId('serviceRows').innerHTML=data.services.map(item=>`<tr><td><strong>${escapeHtml(item.id)}</strong><small>${escapeHtml(item.createdAt)}</small></td><td>${donorCell(item.donor)}</td><td><strong>${escapeHtml(item.skill)}</strong><small>${escapeHtml(item.hours?`${item.hours} hours`:'Hours not supplied')}</small></td><td>${escapeHtml(item.availability)}</td><td><span class="status ${statusClass(item.status)}">${escapeHtml(item.status)}</span></td><td>${item.status==='Offered'?actionButton('service',item.id,'Review'):''}</td></tr>`).join('') || emptyRow(6,'No service offers require action.');
+      byId('auditRows').innerHTML=data.audit.map(item=>`<article class="activity-item"><time>${escapeHtml(item.occurredAt)}</time><strong>${escapeHtml(item.action)}</strong><div>${escapeHtml(item.summary)}<small>${escapeHtml(item.entityType)} ${escapeHtml(item.entityId)} · ${escapeHtml(item.actor)}</small></div></article>`).join('') || '<p class="empty">No audit events are available.</p>';
+      document.querySelectorAll('[data-action-kind]').forEach(button=>button.addEventListener('click',openAction)); setView(state.view);
+    }
+    function contributionRow(item) { return `<tr><td><strong>${escapeHtml(item.id)}</strong><small>${escapeHtml(item.createdAt)}</small></td><td>${donorCell(item.donor)}</td><td>${money(item.currency,item.amount)}</td><td>${evidenceLinks(item.evidenceUrl)}</td><td><span class="status pending">${escapeHtml(item.status)}</span></td><td>${actionButton('contribution',item.id,'Verify')}</td></tr>`; }
+    function actionButton(kind,id,label) { return `<button class="row-action" type="button" data-action-kind="${escapeHtml(kind)}" data-action-id="${escapeHtml(id)}">${escapeHtml(label)}</button>`; }
+    const actionCopy={contribution:{title:'Verify manual payment',copy:'This issues a receipt and counts the amount as received.',check:'I matched this payment against the bank record.',method:'adminConfirmContribution'},asset:{title:'Accept asset for transfer',copy:'Acceptance records completed review. Legal title transfer is tracked separately.',check:'Valuation, ownership, conflict, and gift-acceptance checks are complete.',method:'adminApproveAsset'},service:{title:'Accept service offer',copy:'The offer will move into the scheduling workflow.',check:'This offer matches an approved operational need.',method:'adminAcceptService'}};
+    function openAction(event) { const kind=event.currentTarget.dataset.actionKind; state.action={kind,id:event.currentTarget.dataset.actionId}; const copy=actionCopy[kind]; byId('dialogTitle').textContent=copy.title; byId('dialogCopy').textContent=`${copy.copy} Reference: ${state.action.id}`; byId('checkLabel').textContent=copy.check; byId('actionNote').value=''; byId('actionCheck').checked=false; byId('dialogError').textContent=''; byId('actionDialog').showModal(); }
+    byId('actionForm').addEventListener('submit',event=>{ if (event.submitter && event.submitter.value==='cancel') return; event.preventDefault(); const note=byId('actionNote').value.trim(); if(!byId('actionCheck').checked||note.length<5){byId('dialogError').textContent='Tick the confirmation and add a short verification note.';return;} const button=byId('confirmAction'); button.disabled=true; button.textContent='Saving…'; const runner=google.script.run.withSuccessHandler(result=>{button.disabled=false;button.textContent='Confirm';byId('actionDialog').close();showNotice(result.message);render(result.data);}).withFailureHandler(error=>{button.disabled=false;button.textContent='Confirm';byId('dialogError').textContent=error.message||'The action could not be completed.';}); if(state.action.kind==='contribution') runner.adminConfirmContribution(state.action.id,true,note); else if(state.action.kind==='asset') runner.adminApproveAsset(state.action.id,true,note); else runner.adminAcceptService(state.action.id,true,note); });
+    function load() { clearNotice(); byId('refreshButton').disabled=true; google.script.run.withSuccessHandler(data=>{byId('refreshButton').disabled=false;render(data);}).withFailureHandler(error=>{byId('refreshButton').disabled=false;byId('loading').hidden=true;showNotice(error.message||'Trustee access could not be verified.',true);}) .getAdminDashboardData(); }
+    byId('refreshButton').addEventListener('click',load); load();
+  </script>
+</body>
+</html>
