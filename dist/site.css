@@ -110,29 +110,23 @@ img {
 }
 
 .brand-mark {
-  position: relative;
   display: grid;
-  flex: 0 0 2.5rem;
-  width: 2.5rem;
-  height: 2.5rem;
+  flex: 0 0 3rem;
+  width: 3rem;
+  height: 3rem;
+  overflow: hidden;
   place-items: center;
-  border: 1px solid currentColor;
+  border-radius: 0.45rem;
+  background: #fff;
+  box-shadow: 0 0.4rem 1.2rem rgba(4, 19, 31, 0.16);
 }
 
-.brand-mark::after {
-  position: absolute;
-  inset: 0.22rem;
-  content: "";
-  border: 1px solid rgba(199, 139, 82, 0.68);
-}
-
-.brand-mark span {
-  position: relative;
-  z-index: 1;
-  color: var(--copper);
-  font-family: var(--serif);
-  font-size: 1.55rem;
-  line-height: 1;
+.brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 0.14rem;
 }
 
 .brand-copy {
@@ -616,6 +610,166 @@ img {
   gap: 0.9rem;
   width: min(100%, var(--max-width));
   margin: clamp(3rem, 6vw, 5rem) auto 0;
+}
+
+.identity {
+  background: #f7f5f0;
+}
+
+.identity-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(18rem, 0.7fr);
+  gap: 1rem 4rem;
+  align-items: end;
+}
+
+.identity-heading .section-index {
+  grid-column: 1 / -1;
+}
+
+.identity-heading h2 {
+  max-width: 14ch;
+}
+
+.identity-heading .section-intro {
+  margin: 0 0 0.45rem;
+}
+
+.identity-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  gap: 1rem;
+  width: min(100%, var(--max-width));
+  margin: clamp(3rem, 6vw, 5rem) auto 0;
+}
+
+.identity-card {
+  position: relative;
+  min-height: 18rem;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  padding: clamp(1.5rem, 3vw, 2.6rem);
+  background: #fff;
+}
+
+.identity-card::after {
+  position: absolute;
+  right: -4.5rem;
+  bottom: -6.5rem;
+  width: 13rem;
+  height: 13rem;
+  border: 1px solid rgba(194, 31, 47, 0.18);
+  content: "";
+  transform: rotate(45deg);
+}
+
+.mission-card {
+  color: #fff;
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+.mission-card::after {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.cooperation-card {
+  grid-column: 1 / -1;
+  min-height: auto;
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 1fr);
+  gap: 2rem;
+  align-items: center;
+  color: var(--ink);
+  background: #d7a16d;
+  border-color: #d7a16d;
+}
+
+.identity-label {
+  margin: 0;
+  color: #a11b2a;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.mission-card .identity-label {
+  color: #e0a66f;
+}
+
+.identity-statement {
+  position: relative;
+  z-index: 1;
+  max-width: 30ch;
+  margin: clamp(3rem, 7vw, 6rem) 0 0;
+  font-family: var(--serif);
+  font-size: clamp(1.55rem, 2.7vw, 2.55rem);
+  line-height: 1.23;
+}
+
+.mission-card .identity-statement {
+  max-width: 38ch;
+  color: rgba(255, 255, 255, 0.93);
+}
+
+.cooperation-card .identity-statement {
+  max-width: none;
+  margin: 0;
+}
+
+.core-values {
+  display: grid;
+  grid-template-columns: minmax(13rem, 0.65fr) minmax(0, 1.35fr);
+  gap: 2rem 5rem;
+  width: min(100%, var(--max-width));
+  margin: 1rem auto 0;
+  border: 1px solid var(--line);
+  padding: clamp(1.5rem, 3vw, 2.6rem);
+  background: #fff;
+}
+
+.values-heading h3 {
+  margin: 0.55rem 0 0;
+  font-family: var(--serif);
+  font-size: clamp(1.65rem, 2.5vw, 2.35rem);
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.values-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+
+.values-list li {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  gap: 0.8rem;
+  align-items: center;
+  min-height: 5rem;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 1rem;
+}
+
+.values-list span {
+  color: #a11b2a;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.values-list strong {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  font-weight: 400;
 }
 
 .contribution-card {
@@ -1833,6 +1987,30 @@ fieldset legend {
     transition: transform 160ms ease;
   }
 
+  .identity-heading,
+  .identity-grid,
+  .core-values {
+    grid-template-columns: 1fr;
+  }
+
+  .identity-heading .section-intro {
+    max-width: 38rem;
+    margin-top: 0.6rem;
+  }
+
+  .identity-card {
+    min-height: 15rem;
+  }
+
+  .cooperation-card {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .cooperation-card .identity-statement {
+    margin-top: 0;
+  }
+
   .site-header.menu-open .menu-lines i:first-child {
     transform: translateY(0.15rem) rotate(45deg);
   }
@@ -1965,6 +2143,12 @@ fieldset legend {
     font-size: 0.66rem;
   }
 
+  .brand-mark {
+    flex-basis: 2.65rem;
+    width: 2.65rem;
+    height: 2.65rem;
+  }
+
   .home-page {
     padding-bottom: 4.6rem;
   }
@@ -2007,6 +2191,33 @@ fieldset legend {
 
   .hero-facts dd {
     margin: 0;
+  }
+
+  .identity-grid {
+    gap: 0.75rem;
+  }
+
+  .identity-card {
+    min-height: 13.5rem;
+    padding: 1.35rem;
+  }
+
+  .identity-statement {
+    margin-top: 2.8rem;
+    font-size: clamp(1.4rem, 6.5vw, 2rem);
+  }
+
+  .cooperation-card {
+    min-height: auto;
+  }
+
+  .core-values {
+    gap: 1.5rem;
+    padding: 1.35rem;
+  }
+
+  .values-list {
+    grid-template-columns: 1fr;
   }
 
   .hero-visual {

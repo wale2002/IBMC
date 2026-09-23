@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 220" role="img" aria-labelledby="title desc">
+  <title id="title">Igbajo Baptist Medical Centre logo</title>
+  <desc id="desc">A red double triangle surrounding a black cross with the words Healing Ministry and For the Glory of God.</desc>
+  <path d="M120 13 228 202H12Z" fill="#fff" stroke="#c21f2f" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M120 53 191 180H49Z" fill="none" stroke="#c21f2f" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M111 76h18v35h31v18h-31v42h-18v-42H80v-18h31Z" fill="#111"/>
+  <text x="57" y="171" transform="rotate(-60 57 171)" fill="#111" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="3">HEALING</text>
+  <text x="164" y="63" transform="rotate(60 164 63)" fill="#111" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="3">MINISTRY</text>
+  <text x="120" y="197" fill="#111" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="800" letter-spacing="1" text-anchor="middle">FOR THE GLORY OF GOD</text>
+</svg>
