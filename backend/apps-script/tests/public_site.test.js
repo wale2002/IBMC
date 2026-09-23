@@ -11,6 +11,7 @@ const pledge = fs.readFileSync(path.join(repoRoot, 'dist', 'pledge', 'index.html
 const admin = fs.readFileSync(path.join(repoRoot, 'dist', 'admin', 'index.html'), 'utf8');
 const siteScript = fs.readFileSync(path.join(repoRoot, 'dist', 'site.js'), 'utf8');
 const runtimeConfig = fs.readFileSync(path.join(repoRoot, 'dist', 'runtime-config.js'), 'utf8');
+const logo = fs.readFileSync(path.join(repoRoot, 'dist', 'assets', 'ibmc-logo.svg'), 'utf8');
 
 assert(home.indexOf('runtime-config.js') < home.indexOf('site.js'));
 assert(pledge.indexOf('runtime-config.js') < pledge.indexOf('site.js'));
@@ -21,6 +22,16 @@ for (const path of ['cash', 'equipment', 'shares', 'service']) {
 }
 assert.equal((pledge.match(/class="choice-card"/g) || []).length, 6);
 assert(siteScript.includes('contributionPathMap'));
+for (const statement of [
+  'To be the first-ever successful community medical hub in Osun State and Nigeria.',
+  'To collaborate and consistently provide medical services at subsidized rates',
+  'Cooperating to give sustainable health care.',
+  'Godliness', 'Collaboration', 'Health care', 'Sustainability'
+]) assert(home.includes(statement));
+for (const page of [home, pledge, admin]) assert(page.includes('ibmc-logo.svg'));
+assert(logo.includes('FOR THE GLORY OF GOD'));
+assert(logo.includes('HEALING'));
+assert(logo.includes('MINISTRY'));
 assert(home.includes('./admin/'));
 assert(pledge.includes('../admin/'));
 assert(admin.includes('appsScriptAdminUrl'));
