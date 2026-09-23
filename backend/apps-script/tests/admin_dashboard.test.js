@@ -20,6 +20,8 @@ assert.match(adminServer, /function adminAcceptService[\s\S]*needConfirmed !== t
 assert.match(code, /view === 'admin'/);
 assert.match(code, /createTemplateFromFile\('Admin'\)/);
 assert(adminHtml.includes('Endowment office'));
+assert(adminHtml.includes('FOR THE GLORY OF GOD'));
+assert(adminHtml.includes('HEALING'));
 assert(adminHtml.includes('I matched this payment against the bank record.'));
 assert(adminHtml.includes('google.script.run'));
 assert.match(adminHtml, /@media\(max-width:820px\)[\s\S]*table,tbody,tr,td \{ display:block/);
